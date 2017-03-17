@@ -4,6 +4,24 @@
 
 #include "rgb.h"
 
+#define DMA_CONTROLLER_RCC  CYGHWR_HAL_STM32_CLOCK(AHB1, DMA2)
+#define DMA_CONTROLLER_REG  CYGHWR_HAL_STM32_DMA2
+#define DMA_SET_STREAM      5
+#define DMA_SET_CHANNEL     6
+#define DMA_RESET_STREAM    1
+#define DMA_RESET_CHANNEL   6
+#define DMA_BUFFER_STREAM   2
+#define DMA_BUFFER_CHANNEL  6
+
+#define CC_TIMER            CYGHWR_HAL_STM32_TIM1
+#define CC_PRESCALE_800     0x00
+#define CC_PRESCALE_400     0x01
+#define CC_AUTO_RELOAD      0x95
+#define CC_SET_COUNT        0x53
+#define CC_RESET_COUNT      0x29
+
+#define WS281x_OUTPUT_PORT  CYGHWR_HAL_STM32_GPIOE
+
 class cWS281xDriver
 {
 public:
@@ -19,7 +37,6 @@ private:
     cyg_uint8 *mBuffer;
     cyg_uint32 mBitCount;
     cyg_uint32 mPixelCount;
-    cyg_uint32 mPIO;
     cyg_interrupt mInterrupt;
     cyg_handle_t mIntHandle;
     static cyg_uint32 handleISR(cyg_vector_t vector,cyg_addrword_t data);
@@ -35,12 +52,12 @@ private:
     void setupDMA();
     void setupDMA_MEM2MEM();
 
-    cWS281xDriver(eWS281xModel model);
+    cWS281xDriver(eWS281xModel model, cyg_uint32 *ports, cyg_uint8 count);
     virtual ~cWS281xDriver();
 
 public:
 
-    static void init(eWS281xModel model);
+    static void init(eWS281xModel model, cyg_uint32 *ports, cyg_uint8 count);
     static cWS281xDriver *get();
 
     void resetPixels();

@@ -34,11 +34,6 @@ cInit::cInit() : cDebug("init")
     //diag_printf("pixelCount %d\n", mBitCount);
     //diag_dump_buf(mBuffer, mBitCount);
 
-    cyg_uint32 outputPortNumbers[] =
-    {
-            CYGHWR_HAL_STM32_PIN_OUT(E,  2, OPENDRAIN, NONE, 2MHZ), //OPENDRAIN
-    };
-    cOutput::init(outputPortNumbers, 1);
 }
 
 void cInit::init_thread(cyg_addrword_t args)
@@ -52,7 +47,11 @@ void cInit::init_thread(cyg_addrword_t args)
     };
     cLEDdriver::init(ledList, 1);
 
-    cWS281xDriver::init(cWS281xDriver::WS2812);
+    cyg_uint32 outputPortNumbers[] =
+    {
+            CYGHWR_HAL_STM32_PIN_OUT(E,  2, OPENDRAIN, NONE, 2MHZ), //OPENDRAIN
+    };
+    cWS281xDriver::init(cWS281xDriver::WS2812, outputPortNumbers, 1);
 
 
     cKSESterminal::init((char *)"/dev/tty0",128,"iLED>>");
