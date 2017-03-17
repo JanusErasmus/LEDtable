@@ -37,6 +37,7 @@
 								<option id="gnu.cpp.compiler.option.debugging.level.868163974" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.752887282" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../../ecos/ecos_install/include"/>
+									<listOptionValue builtIn="false" value="../../caboodle/include"/>
 									<listOptionValue builtIn="false" value="../../kmsg/include"/>
 									<listOptionValue builtIn="false" value="../../stm_usb/include"/>
 								</option>
@@ -47,11 +48,13 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1710585423" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
 								<option id="gnu.cpp.link.option.paths.187797936" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
 									<listOptionValue builtIn="false" value="../../ecos/ecos_install/lib"/>
+									<listOptionValue builtIn="false" value="../../caboodle/lib"/>
 									<listOptionValue builtIn="false" value="../../stm_usb/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.flags.1122946915" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="$(ECOS_GLOBAL_LDFLAGS) -T target.ld" valueType="string"/>
 								<option id="gnu.cpp.link.option.libs.1533426361" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="stm_usb"/>
+									<listOptionValue builtIn="false" value="caboodle"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.86805131" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

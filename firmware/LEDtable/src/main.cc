@@ -10,7 +10,7 @@ void * _impure_ptr;    // g++ compatibility
 
 extern "C" void cyg_user_start(void);
 
-cyg_uint32 unitVersion = 0x000100;
+cyg_uint32 SWversion = 0x000100;
 
 void cyg_user_start(void)
 {
@@ -20,3 +20,4 @@ void cyg_user_start(void)
 
     new cInit();
 }
+

@@ -21,12 +21,12 @@ cInit::cInit() : cDebug("init")
 {
     __instance = this;
 
-    cyg_thread_create(INIT_PRIOR,
+    cyg_thread_create(15,
             init_thread,
             (cyg_addrword_t)this,
             (char *)"cInit",
             mLEDStack,
-            INIT_STACK_SIZE,
+            CYGNUM_HAL_STACK_SIZE_TYPICAL,
             &mLEDThreadHandle,
             &mLEDThread);
     cyg_thread_resume(mLEDThreadHandle);
@@ -54,7 +54,7 @@ void cInit::init_thread(cyg_addrword_t args)
     cWS281xDriver::init(cWS281xDriver::WS2812, outputPortNumbers, 1);
 
 
-    cKSESterminal::init((char *)"/dev/tty0",128,"iLED>>");
+    cTerm::init((char *)"/dev/tty0",128,"iLED>>");
 
     cRGB off(0,0,0);
     cRGB color(217 >> 2, 124 >> 2, 13 >> 2);

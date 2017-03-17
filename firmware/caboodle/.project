@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>RFlockJig</name>
+	<name>kmsg</name>
 	<comment></comment>
 	<projects>
-		<project>caboodle</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

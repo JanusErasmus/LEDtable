@@ -1,10 +1,10 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
-# include <cyg/hal/hal_endian.h>
-//#define VT100_OFF
+#include <cyg/kernel/kapi.h>
+#include <cyg/kernel/diag.h>
 
 #define INFO_TRACE(_class, _string, ...)    diag_printf( "%15s : " _string, _class, ##__VA_ARGS__)
-
+#define DEBUG_TRACE(_lvl, _class, _string, ...)    dbg_printf(_lvl, "%15s : " _string, _class, ##__VA_ARGS__)
 #define PRINT_REG(_base, _x)    diag_printf(#_x": 0x%08X\n", *((volatile CYG_WORD32 *)(_base + _x)));
 
 #ifndef VT100_OFF
@@ -31,18 +31,13 @@
 #define MAGENTA_B(__x)    COLOR_BOLD(5, __x )
 #define CYAN_B(__x)        COLOR_BOLD(6, __x )
 
-#define PLATFORM_HTONS(__val) CYG_CPU_TO_BE16(__val)
-#define PLATFORM_HTONL(__val) CYG_CPU_TO_BE32(__val)
-
-extern float nan;
-void initNaN();
-bool isNaN(float num);
-
-void util_htonl(cyg_uint8 * bytes, cyg_uint32 len);
-
 void util_parse_params(char *str,char *argv[],int &argc,char delim1,char delim2);
+cyg_uint32 util_htonl(cyg_uint32 val);
+cyg_uint16 util_htons(cyg_uint16 val);
+
 
 void tagToString(char * string, cyg_uint8* tag);
 cyg_uint64 tagToInt(cyg_uint8* tag);
+void timeToString(cyg_uint32 now, char * string);
 
 #endif //Include Guard

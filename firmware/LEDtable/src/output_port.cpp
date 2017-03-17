@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 #include "output_port.h"
-#include "definitions.h"
 
 cOutput* cOutput::__instance = NULL;
 

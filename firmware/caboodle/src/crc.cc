@@ -2,6 +2,13 @@
 #include "crc.h"
 #include <cyg/kernel/diag.h>
 
+
+const cyg_uint8 escapedChars[] =
+{
+      0x7E, 0x7D, 0x08, 0x7F
+};
+
+
 const cyg_uint16 cCrc::INIT_CRC = 0xFFFF;
 const cyg_uint16 cCrc::GOOD_CRC = 0xF0B8;
 

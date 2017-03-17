@@ -572,7 +572,7 @@ void printAPB2()
 #endif
 }
 
-void stm32cpu::pStatus(cKSESterminal & term, int argc,char * argv[])
+void stm32cpu::pStatus(cTerm & term, int argc,char * argv[])
 {
     diag_printf("Peripheral power status\n");
 
@@ -581,3 +581,21 @@ void stm32cpu::pStatus(cKSESterminal & term, int argc,char * argv[])
     printAPB1();
     printAPB2();
 }
+
+void softwareReset()
+{
+   diag_printf("Device will now RESET\n");
+
+   cyg_thread_delay(100);
+   cyg_scheduler_lock();
+
+   HAL_WRITE_UINT32(0xE000ED00 + 0x0C, (0x5FA << 16) | (1 << 2));
+}
+
+
+const TermCMD::cmd_list_t cpuCommands[] =
+{
+    {"STMcpu"    ,0,0,0},
+    {"pstat",       "",            "Show CPU power status", stm32cpu::pStatus},
+    {0,0,0}
+};

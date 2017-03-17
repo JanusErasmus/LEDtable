@@ -24,7 +24,7 @@ public:
     bool setPortState(cyg_uint8, bool);
 
     void setActiveLow(cyg_uint8 portNumber);
-    static void debugOutputs(cKSESterminal & t,int argc,char *argv[]);
+    static void debugOutputs(cTerm & t,int argc,char *argv[]);
 };
 
 #endif /* RELAY_H_ */

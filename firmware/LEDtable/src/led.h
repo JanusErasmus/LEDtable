@@ -1,8 +1,7 @@
 #ifndef LED_H_
 #define LED_H_
 #include <cyg/kernel/kapi.h>
-
-#include "definitions.h"
+#include <cyg/hal/hal_arch.h>
 
 class cLED
 {
@@ -39,7 +38,7 @@ private:
     cyg_uint8 mLEDCnt;
     cLED ** mLEDs;
 
-    cyg_uint8 mLEDStack[LED_STACK_SIZE];
+    cyg_uint8 mLEDStack[CYGNUM_HAL_STACK_SIZE_MINIMUM];
     cyg_thread mLEDThread;
     cyg_handle_t mLEDThreadHandle;
     static void led_thread(cyg_addrword_t args);

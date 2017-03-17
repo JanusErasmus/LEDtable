@@ -28,12 +28,12 @@ cLEDdriver::cLEDdriver(cLED ** leds, cyg_uint8 ledCount)
 
     setupLEDs(mLEDs, mLEDCnt);
 
-    cyg_thread_create(LED_PRIOR,
+    cyg_thread_create(15,
             cLEDdriver::led_thread,
             (cyg_addrword_t)this,
             (char *)"heartBeat",
             mLEDStack,
-            LED_STACK_SIZE,
+            CYGNUM_HAL_STACK_SIZE_MINIMUM,
             &mLEDThreadHandle,
             &mLEDThread);
     cyg_thread_resume(mLEDThreadHandle);
