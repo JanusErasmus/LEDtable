@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils.h"
-
+#include <utils.h>
 #include "ws281x_driver.h"
 
-#define WS281x_ODR (WS281x_OUTPUT_PORT + CYGHWR_HAL_STM32_GPIO_ODR)
+
+#define TRACE(_x, ...) INFO_TRACE("cWS281xDriver", _x,  ##__VA_ARGS__)
 
 cyg_uint8 SetData = 0xFF;
 cyg_uint8 ResetData = 0x00;
@@ -28,7 +28,7 @@ cWS281xDriver::cWS281xDriver(eWS281xModel model, cyg_uint32 *ports, cyg_uint8 co
 {
     mBufferBusy = 0;
     mSilentCount = 0;
-    mPixelCount = 100;
+    mPixelCount = 58;
     mBitCount = (24 * mPixelCount) + 1;
 
     mBuffer = (cyg_uint8*)malloc(mBitCount);
@@ -128,33 +128,59 @@ void cWS281xDriver::setupDMA_MEM2MEM()
     CR |= CYGHWR_HAL_STM32_DMA_CCR_EN;
     HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SCR( DMA_BUFFER_STREAM ), CR);
 
-    PRINT_REG(DMA_CONTROLLER_REG, CYGHWR_HAL_STM32_DMA_SCR( DMA_BUFFER_STREAM ));
+    //PRINT_REG(DMA_CONTROLLER_REG, CYGHWR_HAL_STM32_DMA_SCR( DMA_BUFFER_STREAM ));
+}
+
+
+extern cyg_uint32 hal_stm32_pclk2;
+
+void cWS281xDriver::getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount)
+{
+    float TIM1tick = 1.0 / (2.0 * (float)hal_stm32_pclk2);
+    float TIM1_ARRvalue = (2.0 * (float)hal_stm32_pclk2) / (float)clockSpeed;
+
+    autoReload = TIM1_ARRvalue;
+    if(clockSpeed == WS2812)
+    {
+        setCount = (float)800e-9 / TIM1tick;
+        resetCount = (float)400e-9 / TIM1tick;
+    }
+    else
+    {
+        setCount = (float)1200e-9 / TIM1tick;
+        resetCount = (float)500e-9 / TIM1tick;
+    }
 }
 
 void cWS281xDriver::setupTimer(cyg_uint32 clockSpeed)
 {
-    cyg_uint32 reg32;
-    CYGHWR_HAL_STM32_CLOCK_ENABLE(CYGHWR_HAL_STM32_CLOCK(APB2, TIM1));
+    cyg_uint32 reg32, autoReload, setCount, resetCount;
 
-//----------------- Setup Timer pre-scaler -------------------------------------
-    if(clockSpeed == 800000)
-        reg32 = CC_PRESCALE_800;
-    else
-        reg32 = CC_PRESCALE_400;
+    getConstants(clockSpeed, autoReload, setCount, resetCount);
 
-    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_PSC, reg32);
+    TRACE("TIM1 Setup:\n");
+    TRACE(" - ARR    : 0x%08X\n", autoReload);
+    TRACE(" - SET    : 0x%08X\n", setCount);
+    TRACE(" - RESET  : 0x%08X\n", resetCount);
+
+    CYGHWR_HAL_STM32_CLOCK_ENABLE(CC_TIMER_RCC);
+
+////----------------- Setup Timer pre-scaler -------------------------------------
+//    if(clockSpeed == 800000)
+//        reg32 = CC_PRESCALE_800;
+//    else
+//        reg32 = CC_PRESCALE_400;
+//
+//    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_PSC, reg32);
 
 //----------------- Setup timer frequency --------------------------------------
-    reg32 = CC_AUTO_RELOAD;
-    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_ARR, reg32);
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_ARR, autoReload);
 
 //----------------- Setup pixel reset trigger when ZERO ------------------------
-    reg32 = CC_SET_COUNT;;
-    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR1, reg32);
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR1, setCount);
 
 //----------------- Setup reset timing for a ONE ------------------------------
-    reg32 = CC_RESET_COUNT;
-    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR2, reg32);
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR2, resetCount);
 
     reg32 =
             (1 << 8)                        |   //update DMA request

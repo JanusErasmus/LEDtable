@@ -4,6 +4,8 @@
 
 #include "rgb.h"
 
+#define WS281x_ODR (WS281x_OUTPUT_PORT + CYGHWR_HAL_STM32_GPIO_ODR)
+
 #define DMA_CONTROLLER_RCC  CYGHWR_HAL_STM32_CLOCK(AHB1, DMA2)
 #define DMA_CONTROLLER_REG  CYGHWR_HAL_STM32_DMA2
 #define DMA_SET_STREAM      5
@@ -13,12 +15,8 @@
 #define DMA_BUFFER_STREAM   2
 #define DMA_BUFFER_CHANNEL  6
 
+#define CC_TIMER_RCC        CYGHWR_HAL_STM32_CLOCK(APB2, TIM1)
 #define CC_TIMER            CYGHWR_HAL_STM32_TIM1
-#define CC_PRESCALE_800     0x00
-#define CC_PRESCALE_400     0x01
-#define CC_AUTO_RELOAD      0x95
-#define CC_SET_COUNT        0x53
-#define CC_RESET_COUNT      0x29
 
 #define WS281x_OUTPUT_PORT  CYGHWR_HAL_STM32_GPIOE
 
@@ -48,6 +46,7 @@ private:
     static cyg_uint32 TIM1handleISR(cyg_vector_t vector,cyg_addrword_t data);
     static void TM1handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_t data);
 
+    void getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount);
     void setupTimer(cyg_uint32 clockSpeed);
     void setupDMA();
     void setupDMA_MEM2MEM();

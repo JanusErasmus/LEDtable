@@ -51,22 +51,34 @@ void cInit::init_thread(cyg_addrword_t args)
     {
             CYGHWR_HAL_STM32_PIN_OUT(E,  2, OPENDRAIN, NONE, 2MHZ), //OPENDRAIN
     };
-    cWS281xDriver::init(cWS281xDriver::WS2812, outputPortNumbers, 1);
+    cWS281xDriver::init(cWS281xDriver::WS2811, outputPortNumbers, 1);
 
 
     cTerm::init((char *)"/dev/tty0",128,"iLED>>");
 
-    cRGB off(0,0,0);
-    cRGB color(217 >> 2, 124 >> 2, 13 >> 2);
-    cRGB green(0x00, 0x00, 0xFF);
+    cRGB off(0x0,0x0,0x0);
+    cRGB color(255,255,255);
+    cRGB blue(0x00, 0x00, 0xFF);
+    cRGB red(0xFF, 0x00, 0x00);
+    cRGB green(0x00, 0xFF, 0x00);
     //((cInit*)args)->setPixels(color);
+
+    cyg_uint8 cnt = 0;
     while(1)
     {
-        cWS281xDriver::get()->setPixel(0, off);
+        cWS281xDriver::get()->setPixel(cnt++, off);
+        cWS281xDriver::get()->setPixel(cnt, color);
 
-        cyg_thread_delay(50);
-        cWS281xDriver::get()->setPixel(0, green);
-        cyg_thread_delay(50);
+        if(cnt > 57)
+            cnt = 0;
+
+        cyg_thread_delay(10);
+//        cWS281xDriver::get()->setPixel(57, red);
+//        cyg_thread_delay(50);
+//        cWS281xDriver::get()->setPixel(57, green);
+//        cyg_thread_delay(50);
+//        cWS281xDriver::get()->setPixel(57, blue);
+//        cyg_thread_delay(50);
 
     }
 }
