@@ -7,6 +7,7 @@
 
 
 #define TRACE(_x, ...) INFO_TRACE("cWS281xDriver", _x,  ##__VA_ARGS__)
+extern cyg_uint32 hal_stm32_pclk2;
 
 cyg_uint8 SetData = 0xFF;
 cyg_uint8 ResetData = 0x00;
@@ -27,8 +28,7 @@ cWS281xDriver *cWS281xDriver::get()
 cWS281xDriver::cWS281xDriver(eWS281xModel model, cyg_uint32 *ports, cyg_uint8 count)
 {
     mBufferBusy = 0;
-    mSilentCount = 0;
-    mPixelCount = 58;
+    mPixelCount = 32;
     mBitCount = (24 * mPixelCount) + 1;
 
     mBuffer = (cyg_uint8*)malloc(mBitCount);
@@ -134,7 +134,7 @@ void cWS281xDriver::setupDMA_MEM2MEM()
 
 extern cyg_uint32 hal_stm32_pclk2;
 
-void cWS281xDriver::getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount)
+void cWS281xDriver::getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount, cyg_uint32 &refreshReload)
 {
     float TIM1tick = 1.0 / (2.0 * (float)hal_stm32_pclk2);
     float TIM1_ARRvalue = (2.0 * (float)hal_stm32_pclk2) / (float)clockSpeed;
@@ -150,31 +150,27 @@ void cWS281xDriver::getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, 
         setCount = (float)1200e-9 / TIM1tick;
         resetCount = (float)500e-9 / TIM1tick;
     }
+
+
+    refreshReload = (((float)19e-3 - ((float)mBitCount / (float)clockSpeed)) / 40) / TIM1tick;
 }
 
 void cWS281xDriver::setupTimer(cyg_uint32 clockSpeed)
 {
-    cyg_uint32 reg32, autoReload, setCount, resetCount;
+    cyg_uint32 reg32, setCount, resetCount;
 
-    getConstants(clockSpeed, autoReload, setCount, resetCount);
+    getConstants(clockSpeed, mAutoReload, setCount, resetCount, mRefreshAutoReload);
 
     TRACE("TIM1 Setup:\n");
-    TRACE(" - ARR    : 0x%08X\n", autoReload);
+    TRACE(" - ARR    : 0x%08X\n", mAutoReload);
     TRACE(" - SET    : 0x%08X\n", setCount);
     TRACE(" - RESET  : 0x%08X\n", resetCount);
+    TRACE(" - refresh: 0x%08X\n", mRefreshAutoReload);
 
     CYGHWR_HAL_STM32_CLOCK_ENABLE(CC_TIMER_RCC);
 
-////----------------- Setup Timer pre-scaler -------------------------------------
-//    if(clockSpeed == 800000)
-//        reg32 = CC_PRESCALE_800;
-//    else
-//        reg32 = CC_PRESCALE_400;
-//
-//    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_PSC, reg32);
-
 //----------------- Setup timer frequency --------------------------------------
-    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_ARR, autoReload);
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_ARR, mAutoReload);
 
 //----------------- Setup pixel reset trigger when ZERO ------------------------
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR1, setCount);
@@ -266,12 +262,17 @@ void cWS281xDriver::handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_
     reg32 |= CYGHWR_HAL_STM32_TIM_DIER_UIE;
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_DIER, reg32);
 
+    //set prescaler
+    reg32 = 40;
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_PSC, reg32);
+
+    //set ARR to refresh rate
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_ARR, ((cWS281xDriver*)data)->mRefreshAutoReload);
 
     reg32 = 0;
     HAL_WRITE_UINT32(WS281x_ODR, reg32);
 
     ((cWS281xDriver*)data)->mBufferBusy = 0;
-    ((cWS281xDriver*)data)->mSilentCount = 10000;
 
     cyg_interrupt_unmask(vector);
 }
@@ -290,16 +291,10 @@ cyg_uint32 cWS281xDriver::TIM1handleISR(cyg_vector_t vector, cyg_addrword_t data
 
     if(SR & 0x01)
     {
-
-        if(!(((cWS281xDriver*)data)->mSilentCount)--)
+        if(!((cWS281xDriver*)data)->mBufferBusy)
         {
             ((cWS281xDriver*)data)->mBufferBusy = 1;
             return (CYG_ISR_CALL_DSR | CYG_ISR_HANDLED);
-        }
-        else
-        {
-            reg32 = 0;
-            HAL_WRITE_UINT32(WS281x_ODR, reg32);
         }
     }
 
@@ -310,6 +305,13 @@ cyg_uint32 cWS281xDriver::TIM1handleISR(cyg_vector_t vector, cyg_addrword_t data
 void cWS281xDriver::TM1handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_t data)
 {
     cyg_uint32 CR, reg32;
+
+    //reset Prescaler
+    reg32 = 0;
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_PSC, reg32);
+
+    //reset ARR
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_ARR, ((cWS281xDriver*)data)->mAutoReload);
 
     //stop timer
     HAL_READ_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CR1, CR);

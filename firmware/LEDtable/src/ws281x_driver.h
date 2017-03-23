@@ -40,13 +40,14 @@ private:
     static cyg_uint32 handleISR(cyg_vector_t vector,cyg_addrword_t data);
     static void handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_t data);
 
-    cyg_uint32 mSilentCount;
+    cyg_uint32 mAutoReload;
+    cyg_uint32 mRefreshAutoReload;
     cyg_interrupt mTM1interrupt;
     cyg_handle_t mTM1intHandle;
     static cyg_uint32 TIM1handleISR(cyg_vector_t vector,cyg_addrword_t data);
     static void TM1handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_t data);
 
-    void getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount);
+    void getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount, cyg_uint32 &refreshReload);
     void setupTimer(cyg_uint32 clockSpeed);
     void setupDMA();
     void setupDMA_MEM2MEM();

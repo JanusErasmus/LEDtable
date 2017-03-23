@@ -49,9 +49,10 @@ void cInit::init_thread(cyg_addrword_t args)
 
     cyg_uint32 outputPortNumbers[] =
     {
-            CYGHWR_HAL_STM32_PIN_OUT(E,  2, OPENDRAIN, NONE, 2MHZ), //OPENDRAIN
+            CYGHWR_HAL_STM32_PIN_OUT(E,  2, OPENDRAIN, NONE, 2MHZ),
+            CYGHWR_HAL_STM32_PIN_OUT(E,  3, PUSHPULL, NONE, 2MHZ),
     };
-    cWS281xDriver::init(cWS281xDriver::WS2811, outputPortNumbers, 1);
+    cWS281xDriver::init(cWS281xDriver::WS2812, outputPortNumbers, 1);
 
 
     cTerm::init((char *)"/dev/tty0",128,"iLED>>");
@@ -66,10 +67,10 @@ void cInit::init_thread(cyg_addrword_t args)
     cyg_uint8 cnt = 0;
     while(1)
     {
-        cWS281xDriver::get()->setPixel(cnt++, off);
-        cWS281xDriver::get()->setPixel(cnt, color);
+//        cWS281xDriver::get()->setPixel(cnt++, off);
+//        cWS281xDriver::get()->setPixel(cnt, color);
 
-        if(cnt > 57)
+        if(cnt > 32)
             cnt = 0;
 
         cyg_thread_delay(10);
