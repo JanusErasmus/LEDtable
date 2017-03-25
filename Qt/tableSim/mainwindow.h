@@ -3,7 +3,7 @@
 #include <QMainWindow>
 
 #include "led_table.h"
-#include "clock.h"
+#include "tetris.h"
 
 namespace Ui {
 class MainWindow;
@@ -13,8 +13,10 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    RGB *mGrid[16][16];
+
     LEDtable *mTable;
-    Clock *mClock;
+    tetris *mTetris;
 
     Ui::MainWindow *ui;
     void paintEvent(QPaintEvent *);
