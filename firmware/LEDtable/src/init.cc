@@ -53,7 +53,7 @@ void cInit::init_thread(cyg_addrword_t args)
             CYGHWR_HAL_STM32_PIN_OUT(C,  5, OPENDRAIN, NONE, 2MHZ),
             CYGHWR_HAL_STM32_PIN_OUT(C,  6, OPENDRAIN, NONE, 2MHZ),
     };
-    cWS281xDriver::init(cWS281xDriver::WS2812, outputPortNumbers, 2);
+    cWS281xDriver::init(cWS281xDriver::WS2812, 58, outputPortNumbers, 2);
 
 
 
@@ -62,7 +62,7 @@ void cInit::init_thread(cyg_addrword_t args)
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
 
     cRGB off(0x0,0x0,0x0);
-    cRGB color(255,255,255);
+    cRGB white(255,255,255);
     cRGB blue(0x00, 0x00, 0xFF);
     cRGB red(0xFF, 0x00, 0x00);
     cRGB green(0x00, 0xFF, 0x00);
@@ -71,9 +71,13 @@ void cInit::init_thread(cyg_addrword_t args)
     cRGB mix3(0x00, 0xFF, 0xFF);
 
     cyg_uint8 cColor = 0;
-    cRGB *pColor[] = {&off, &red, &green, &blue, &color, &mix1, &mix2, &mix3};
+    cRGB *pColor[] = {&off, &red, &green, &blue, &white, &mix1, &mix2, &mix3};
 
-//    cWS281xDriver::get()->setPixel(1, red);
+    cRGB color(0x02, 0x81, 0x81);
+
+    cWS281xDriver::get()->setPixel(0, color);
+    cWS281xDriver::get()->setPixel(1, color);
+    cWS281xDriver::get()->setPixel(57, color);
 //    cWS281xDriver::get()->paint();
 
     cyg_uint8 ledCount = 57;
@@ -81,37 +85,11 @@ void cInit::init_thread(cyg_addrword_t args)
     cyg_int8 cnt = 0;
     while(1)
     {
-//    		{
-//
-//        cWS281xDriver::get()->setPixel(cnt++, off);
-//    		cWS281xDriver::get()->setPixel(cnt, color);
-//    	}
-//
-//        cWS281xDriver::get()->paint();
-//
-//        if(++cnt > 57)
-//            cnt = 0;
 
         cWS281xDriver::get()->setPixel(cnt, *pColor[cColor]);
         cWS281xDriver::get()->paint();
         cyg_thread_delay(5);
 		cWS281xDriver::get()->setPixel(cnt, off);
-
-//        cWS281xDriver::get()->setPixel(cnt, green);
-//        cWS281xDriver::get()->paint();
-//        cyg_thread_delay(5);
-//
-//        cWS281xDriver::get()->setPixel(cnt, blue);
-//        cWS281xDriver::get()->paint();
-//        cyg_thread_delay(5);
-//
-//        cWS281xDriver::get()->setPixel(cnt, color);
-//        cWS281xDriver::get()->paint();
-//        cyg_thread_delay(1);
-
-//        cWS281xDriver::get()->setPixel(cnt, off);
-//        cWS281xDriver::get()->paint();
-//        cyg_thread_delay(10);
 
         cnt+= diff;
 
@@ -122,14 +100,14 @@ void cInit::init_thread(cyg_addrword_t args)
 
         	cColor++;
         }
-
-		if(cnt < 0)
+        else if(cnt < 0)
         {
         	diff = 1;
-        	cnt = 1;
+        	cnt = 0;
 
         	cColor++;
         }
+
     	if(cColor > 8)
     		cColor = 1;
 

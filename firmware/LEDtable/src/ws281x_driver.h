@@ -11,7 +11,7 @@
 
 #define DMA_CONTROLLER_RCC  CYGHWR_HAL_STM32_CLOCK(AHB1, DMA2)
 #define DMA_CONTROLLER_REG  CYGHWR_HAL_STM32_DMA2
-#define DMA_UPDATE_STREAM   5
+#define DMA_UPDATE_STREAM   6
 #define DMA_UPDATE_CHANNEL  6
 #define DMA_RESET_STREAM    1
 #define DMA_RESET_CHANNEL   6
@@ -33,7 +33,6 @@ public:
 private:
     static cWS281xDriver *__instance;
 
-    cyg_atomic mBufferBusy;
     cyg_uint8 *mBuffer;
     cyg_uint32 mBitCount;
     cyg_uint32 mPixelCount;
@@ -46,12 +45,12 @@ private:
     void setupDMA();
     void setupDMA_MEM2MEM();
 
-    cWS281xDriver(eWS281xModel model, cyg_uint32 *ports, cyg_uint8 count);
+    cWS281xDriver(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count);
     virtual ~cWS281xDriver();
 
 public:
 
-    static void init(eWS281xModel model, cyg_uint32 *ports, cyg_uint8 count);
+    static void init(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count);
     static cWS281xDriver *get();
 
     void resetPixels();
