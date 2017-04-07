@@ -7,13 +7,16 @@
 #include <cyg/io/ttyio.h>
 #include <cyg/hal/var_io.h>
 #include <cyg/error/strerror.h>
+#include <cyg/io/flash.h>
 
 #include "init.h"
 #include "led.h"
 #include "kses_term.h"
 #include "output_port.h"
-
+#include "spi_dev.h"
 #include "ws281x_driver.h"
+
+#define TRACE(_x, ...) INFO_TRACE("cInit", _x,  ##__VA_ARGS__)
 
 cInit * cInit::__instance = 0;
 
@@ -38,9 +41,7 @@ cInit::cInit() : cDebug("init")
 
 void cInit::init_thread(cyg_addrword_t args)
 {
-    cLED *statusLED  = new cLED(
-            CYGHWR_HAL_STM32_PIN_OUT(E,  9, PUSHPULL, NONE, 2MHZ),
-            CYGHWR_HAL_STM32_PIN_OUT(E,  10, PUSHPULL, NONE, 2MHZ));
+    cLED *statusLED  = new cLED(CYGHWR_HAL_STM32_PIN_OUT(A,  5, PUSHPULL, NONE, 2MHZ), 0);
 
     cLED *ledList[] = {
             statusLED,
@@ -49,38 +50,90 @@ void cInit::init_thread(cyg_addrword_t args)
 
     cyg_uint32 outputPortNumbers[] =
     {
-            CYGHWR_HAL_STM32_PIN_OUT(E,  2, OPENDRAIN, NONE, 2MHZ),
-            CYGHWR_HAL_STM32_PIN_OUT(E,  3, PUSHPULL, NONE, 2MHZ),
+            CYGHWR_HAL_STM32_PIN_OUT(C,  5, OPENDRAIN, NONE, 2MHZ),
+            CYGHWR_HAL_STM32_PIN_OUT(C,  6, OPENDRAIN, NONE, 2MHZ),
     };
-    cWS281xDriver::init(cWS281xDriver::WS2812, outputPortNumbers, 1);
+    cWS281xDriver::init(cWS281xDriver::WS2812, outputPortNumbers, 2);
 
 
-    cTerm::init((char *)"/dev/tty0",128,"iLED>>");
+
+//    initFlash();
+
+    cTerm::init((char *)"/dev/tty1",128,"iLED>>");
 
     cRGB off(0x0,0x0,0x0);
     cRGB color(255,255,255);
     cRGB blue(0x00, 0x00, 0xFF);
     cRGB red(0xFF, 0x00, 0x00);
     cRGB green(0x00, 0xFF, 0x00);
-    //((cInit*)args)->setPixels(color);
+    cRGB mix1(0xFF, 0xFF, 0x00);
+    cRGB mix2(0xFF, 0x00, 0xFF);
+    cRGB mix3(0x00, 0xFF, 0xFF);
 
-    cyg_uint8 cnt = 0;
+    cyg_uint8 cColor = 0;
+    cRGB *pColor[] = {&off, &red, &green, &blue, &color, &mix1, &mix2, &mix3};
+
+//    cWS281xDriver::get()->setPixel(1, red);
+//    cWS281xDriver::get()->paint();
+
+    cyg_uint8 ledCount = 57;
+    cyg_int8 diff = 1;
+    cyg_int8 cnt = 0;
     while(1)
     {
+//    		{
+//
 //        cWS281xDriver::get()->setPixel(cnt++, off);
+//    		cWS281xDriver::get()->setPixel(cnt, color);
+//    	}
+//
+//        cWS281xDriver::get()->paint();
+//
+//        if(++cnt > 57)
+//            cnt = 0;
+
+        cWS281xDriver::get()->setPixel(cnt, *pColor[cColor]);
+        cWS281xDriver::get()->paint();
+        cyg_thread_delay(5);
+		cWS281xDriver::get()->setPixel(cnt, off);
+
+//        cWS281xDriver::get()->setPixel(cnt, green);
+//        cWS281xDriver::get()->paint();
+//        cyg_thread_delay(5);
+//
+//        cWS281xDriver::get()->setPixel(cnt, blue);
+//        cWS281xDriver::get()->paint();
+//        cyg_thread_delay(5);
+//
 //        cWS281xDriver::get()->setPixel(cnt, color);
+//        cWS281xDriver::get()->paint();
+//        cyg_thread_delay(1);
 
-        if(cnt > 32)
-            cnt = 0;
+//        cWS281xDriver::get()->setPixel(cnt, off);
+//        cWS281xDriver::get()->paint();
+//        cyg_thread_delay(10);
 
-        cyg_thread_delay(10);
-//        cWS281xDriver::get()->setPixel(57, red);
-//        cyg_thread_delay(50);
-//        cWS281xDriver::get()->setPixel(57, green);
-//        cyg_thread_delay(50);
-//        cWS281xDriver::get()->setPixel(57, blue);
-//        cyg_thread_delay(50);
+        cnt+= diff;
 
+        if(cnt > ledCount)
+        {
+        	diff = -1;
+        	cnt = ledCount - 1;
+
+        	cColor++;
+        }
+
+		if(cnt < 0)
+        {
+        	diff = 1;
+        	cnt = 1;
+
+        	cColor++;
+        }
+    	if(cColor > 8)
+    		cColor = 1;
+
+//		diag_printf("%d\n", cnt);
     }
 }
 

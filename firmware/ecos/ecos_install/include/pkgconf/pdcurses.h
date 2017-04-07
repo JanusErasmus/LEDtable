@@ -1,0 +1,23 @@
+#ifndef CYGONCE_PKGCONF_PDCURSES_H
+#define CYGONCE_PKGCONF_PDCURSES_H
+/*
+ * File <pkgconf/pdcurses.h>
+ *
+ * This file is generated automatically by the configuration
+ * system. It should not be edited. Any changes to this file
+ * may be overwritten.
+ */
+
+#define CYGBLD_PDCURSES_TERMINAL_DRIVER_SERIAL 1
+#define CYGINT_PDCURSES_TERMINAL_DRIVER 1
+#define CYGINT_PDCURSES_TERMINAL_DRIVER_1
+#define CYGDAT_PDCURSES_DRIVER_SERIAL_DEV "/dev/ser0"
+#define CYGDAT_PDCURSES_DRIVER_USE_VT100_ATTR 1
+#define CYGDAT_PDCURSES_DRIVER_USE_ANSI_COLORS 1
+#define CYGDAT_PDCURSES_DRIVER_USE_KEYPAD_KEYS 1
+#define CYGDAT_PDCURSES_DRIVER_SCREEN_COLUMNS 80
+#define CYGDAT_PDCURSES_DRIVER_SCREEN_COLUMNS_80
+#define CYGDAT_PDCURSES_DRIVER_SCREEN_ROWS 25
+#define CYGDAT_PDCURSES_DRIVER_SCREEN_ROWS_25
+
+#endif

@@ -21,7 +21,7 @@ cLEDdriver* cLEDdriver::get()
 
 cLEDdriver::cLEDdriver(cLED ** leds, cyg_uint8 ledCount)
 {
-    mStatus = UNCONNECTED;
+    mStatus = CONNECTED;
     mLEDCnt = ledCount;
     mLEDs = new cLED*[ledCount];
     memcpy(mLEDs, leds, (sizeof(cLED*) * ledCount));

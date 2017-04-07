@@ -51,6 +51,8 @@ cdl_configuration eCos {
     package -hardware CYGPKG_HAL_CORTEXM current ;
     package -hardware CYGPKG_HAL_CORTEXM_STM32 current ;
     package -hardware CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE current ;
+    package -hardware CYGPKG_PDCURSES current ;
+    package -hardware CYGPKG_DEVS_FLASH_STM32 current ;
     package -hardware CYGPKG_IO_SERIAL_CORTEXM_STM32 current ;
     package -hardware CYGPKG_IO_SPI current ;
     package -hardware CYGPKG_DEVS_SPI_CORTEXM_STM32 current ;
@@ -62,7 +64,28 @@ cdl_configuration eCos {
 };
 
 # ---- conflicts -------------------------------------------------------
-# There are no conflicts.
+# There are 5 conflicts.
+#
+# package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+#   Property Requires
+#   "requires" constraint not satisfied:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE == "HSE" 
+#
+# package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+#   Property Requires
+#   "requires" constraint not satisfied:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 8 
+#
+# package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+#   Property Requires
+#   "requires" constraint not satisfied:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL == 240 
+#
+# package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+#   Property Requires
+#   "requires" constraint not satisfied:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK1_DIV == 4 
+#
+# package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+#   Property Requires
+#   "requires" constraint not satisfied:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK2_DIV == 2 
+
 
 # ---- contents --------------------------------------------------------
 # >
@@ -471,9 +494,8 @@ cdl_option CYGPKG_HAL_EXCEPTIONS {
 #
 cdl_option CYGSEM_HAL_STOP_CONSTRUCTORS_ON_FLAG {
     # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
+    user_value 0
+    # value_source user
     # Default value: 0
     # Requires: CYGSEM_LIBC_INVOKE_DEFAULT_STATIC_CONSTRUCTORS
     #     CYGSEM_LIBC_INVOKE_DEFAULT_STATIC_CONSTRUCTORS == 0
@@ -1666,9 +1688,8 @@ cdl_option CYGHWR_HAL_CORTEXM {
 #
 cdl_option CYGHWR_HAL_CORTEXM_SYSTICK_CLK_SOURCE {
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value EXTERNAL
-    # value_source default
+    user_value INTERNAL
+    # value_source user
     # Default value: EXTERNAL
     # Legal values:  "EXTERNAL" "INTERNAL" 
 };
@@ -2467,6 +2488,10 @@ cdl_option CYGHWR_HAL_CORTEXM_STM32_FAMILY {
     # package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
     #     Requires:  CYGHWR_HAL_CORTEXM_STM32_FAMILY == "F4" &&
     #                         CYGHWR_HAL_CORTEXM_STM32_F4 == "F407VG" 
+    # option CYGNUM_DEVS_FLASH_STM32_PARALLELISM
+    #     ActiveIf:  ((CYGHWR_HAL_CORTEXM_STM32_FAMILY == "F2") || (CYGHWR_HAL_CORTEXM_STM32_FAMILY == "F4")) 
+    # option CYGNUM_DEVS_FLASH_STM32_PARALLELISM
+    #     ActiveIf:  ((CYGHWR_HAL_CORTEXM_STM32_FAMILY == "F2") || (CYGHWR_HAL_CORTEXM_STM32_FAMILY == "F4")) 
     # option CYGNUM_DEVS_SPI_CORTEXM_STM32_PIN_TOGGLE_RATE
     #     DefaultValue:  (CYGHWR_HAL_CORTEXM_STM32_FAMILY == "F1") ? 10 : 25 
 };
@@ -2667,9 +2692,8 @@ cdl_component CYGHWR_HAL_CORTEXM_STM32_CLOCK {
 #
 cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE {
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value HSE
-    # value_source default
+    user_value HSI
+    # value_source user
     # Default value: HSE
     # Legal values:  "HSI" "HSE" 
 
@@ -2690,27 +2714,27 @@ cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE {
 #
 cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV {
     # Flavor: data
-    user_value 8
+    user_value 16
     # value_source user
     # Default value: 1
     # Legal values: 1 to 63
     # Requires:  !CYGHWR_HAL_CORTEXM_STM32_CONNECTIVITY implies (CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV <= 2) 
     #     CYGHWR_HAL_CORTEXM_STM32_CONNECTIVITY == 1
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 8
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 16
     #   --> 1
     # Requires:  (CYGHWR_HAL_CORTEXM_STM32_FAMILY=="F1") implies (CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV <= 16) 
     #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 8
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 16
     #   --> 1
     # Requires:  ((CYGHWR_HAL_CORTEXM_STM32_FAMILY=="F1") && (CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE == "HSI")) implies  (CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 2) 
     #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE == HSE
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 8
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE == HSI
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 16
     #   --> 1
     # Requires:  ((CYGHWR_HAL_CORTEXM_STM32_FAMILY=="F2") || (CYGHWR_HAL_CORTEXM_STM32_FAMILY=="F4")) implies (CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV >= 2) 
     #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
     #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 8
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 16
     #   --> 1
 
     # The following properties are affected by this value
@@ -2733,18 +2757,18 @@ cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV {
 #
 cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL {
     # Flavor: data
-    user_value 240
+    user_value 200
     # value_source user
     # Default value: 9
     # Legal values: 2 to 432
     # Requires:  (CYGHWR_HAL_CORTEXM_STM32_FAMILY=="F1") implies (CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL <= 16) 
     #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL == 240
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL == 200
     #   --> 1
     # Requires:  ((CYGHWR_HAL_CORTEXM_STM32_FAMILY=="F2") || (CYGHWR_HAL_CORTEXM_STM32_FAMILY=="F4")) implies (CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL <= 432) 
     #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
     #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL == 240
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL == 200
     #   --> 1
 
     # The following properties are affected by this value
@@ -2799,7 +2823,7 @@ cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_HCLK_DIV {
 #
 cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK1_DIV {
     # Flavor: data
-    user_value 4
+    user_value 1
     # value_source user
     # Default value: 2
     # Legal values:  1 2 4 8 16 
@@ -2814,7 +2838,7 @@ cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK1_DIV {
 #
 cdl_option CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK2_DIV {
     # Flavor: data
-    user_value 2
+    user_value 1
     # value_source user
     # Default value: 1
     # Legal values:  1 2 4 8 16 
@@ -3017,9 +3041,8 @@ cdl_option CYGHWR_HAL_STM32_UART0_REMAP {
 #
 cdl_option CYGHWR_HAL_STM32_UART1_REMAP {
     # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
+    user_value 0
+    # value_source user
     # Default value: 0
 };
 
@@ -3034,6 +3057,10 @@ cdl_option CYGHWR_HAL_STM32_UART2_REMAP {
     # value_source user
     # Default value: NONE
     # Legal values:  "NONE" "PARTIAL" "FULL" 
+
+    # The following properties are affected by this value
+    # package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+    #     Requires:  CYGHWR_HAL_STM32_UART2_REMAP == "FULL" 
 };
 
 # Remap I2C bus 1 pins
@@ -3060,8 +3087,9 @@ cdl_option CYGHWR_HAL_STM32_SPI1_REMAP {
     #   --> 1
 
     # Flavor: bool
-    user_value 0
-    # value_source user
+    # No user value, uncomment the following line to provide one.
+    # user_value 0
+    # value_source default
     # Default value: 0
 };
 
@@ -3072,9 +3100,8 @@ cdl_option CYGHWR_HAL_STM32_SPI1_REMAP {
 #
 cdl_option CYGHWR_HAL_STM32_SPI2_REMAP {
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value NONE
-    # value_source default
+    user_value NONE
+    # value_source user
     # Default value: NONE
     # Legal values:  "NONE" "PARTIAL" "FULL" 
 };
@@ -3092,9 +3119,8 @@ cdl_option CYGHWR_HAL_STM32_SPI3_REMAP {
     #   --> 1
 
     # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
+    user_value 1
+    # value_source user
     # Default value: 0
 };
 
@@ -3227,14 +3253,14 @@ cdl_package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE {
     #     CYGHWR_HAL_CORTEXM_STM32_F4 == F407VG
     #   --> 1
     # Requires:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE == "HSE" 
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE == HSE
-    #   --> 1
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_SOURCE == HSI
+    #   --> 0
     # Requires:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 8 
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 8
-    #   --> 1
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_PREDIV == 16
+    #   --> 0
     # Requires:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL == 240 
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL == 240
-    #   --> 1
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PLL_MUL == 200
+    #   --> 0
     # Requires:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_SYSCLK_DIV == 2 
     #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_SYSCLK_DIV == 2
     #   --> 1
@@ -3245,10 +3271,22 @@ cdl_package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE {
     #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_HCLK_DIV == 1
     #   --> 1
     # Requires:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK1_DIV == 4 
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK1_DIV == 4
-    #   --> 1
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK1_DIV == 1
+    #   --> 0
     # Requires:  CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK2_DIV == 2 
-    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK2_DIV == 2
+    #     CYGHWR_HAL_CORTEXM_STM32_CLOCK_PCLK2_DIV == 1
+    #   --> 0
+    # Requires:  CYGHWR_HAL_STM32_UART2_REMAP == "FULL" 
+    #     CYGHWR_HAL_STM32_UART2_REMAP == FULL
+    #   --> 1
+    # Requires:  CYGFUN_INFRA_EMPTY_DELETE_FUNCTIONS == 0 
+    #     CYGFUN_INFRA_EMPTY_DELETE_FUNCTIONS == 0
+    #   --> 1
+    # Requires:  CYGFUN_KERNEL_THREADS_STACK_MEASUREMENT == 1 
+    #     CYGFUN_KERNEL_THREADS_STACK_MEASUREMENT == 1
+    #   --> 1
+    # Requires:  CYGHWR_DEVS_I2C_CORTEXM_STM32_MULTIPLE_BUSES == 1 
+    #     CYGHWR_DEVS_I2C_CORTEXM_STM32_MULTIPLE_BUSES == 1
     #   --> 1
 };
 
@@ -3347,7 +3385,7 @@ cdl_option CYGNUM_HAL_CORTEXM_STM32_IMAGE_ADDRESS {
 #
 cdl_option CYGARC_HAL_CORTEXM_STM32_INPUT_CLOCK {
     # Flavor: data
-    user_value 8000000
+    user_value 16000000
     # value_source user
     # Default value: 8000000
     # Legal values: 0 to 1000000000
@@ -4250,6 +4288,8 @@ cdl_component CYGPKG_IO_SERIAL_DEVICES {
     # The following properties are affected by this value
     # option CYGPKG_IO_SERIAL_TESTS
     #     Calculated:  CYGPKG_IO_SERIAL_DEVICES ? "tests/serial1 tests/serial2 tests/serial3 tests/serial4 tests/serial5 tests/tty1 tests/tty2 tests/flow1 tests/flow2" : "" 
+    # component CYGBLD_PDCURSES_TERMINAL_DRIVER_SERIAL
+    #     Requires: 1 == CYGPKG_IO_SERIAL_DEVICES
 };
 
 # >
@@ -4441,7 +4481,7 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL1_INT_PRI {
 #
 cdl_component CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 {
     # Flavor: bool
-    user_value 1
+    user_value 0
     # value_source user
     # Default value: CYGINT_HAL_STM32_UART2>0
     #     CYGINT_HAL_STM32_UART2 == 0
@@ -4460,6 +4500,9 @@ cdl_component CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 {
 # ST STM32 port 2.
 #
 cdl_option CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL2_NAME {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value "\"/dev/ser2\""
@@ -4476,6 +4519,9 @@ cdl_option CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL2_NAME {
 # ST STM32 port 2.
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL2_BAUD {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 115200
@@ -4493,6 +4539,9 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL2_BAUD {
 # for the ST STM32 port 2.
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL2_BUFSIZE {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 is disabled
+
     # Flavor: data
     user_value 128
     # value_source user
@@ -4503,6 +4552,9 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL2_BUFSIZE {
 # Interrupt priority for STM32 serial port 2
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL2_INT_PRI {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 128
@@ -4518,7 +4570,7 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL2_INT_PRI {
 #
 cdl_component CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 {
     # Flavor: bool
-    user_value 1
+    user_value 0
     # value_source user
     # Default value: CYGINT_HAL_STM32_UART3>0
     #     CYGINT_HAL_STM32_UART3 == 0
@@ -4537,6 +4589,9 @@ cdl_component CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 {
 # ST STM32 port 3.
 #
 cdl_option CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL3_NAME {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value "\"/dev/ser3\""
@@ -4553,6 +4608,9 @@ cdl_option CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL3_NAME {
 # ST STM32 port 3.
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL3_BAUD {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 115200
@@ -4570,6 +4628,9 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL3_BAUD {
 # for the ST STM32 port 3.
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL3_BUFSIZE {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 128
@@ -4581,6 +4642,9 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL3_BUFSIZE {
 # Interrupt priority for STM32 serial port 3
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL3_INT_PRI {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 128
@@ -4596,7 +4660,7 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL3_INT_PRI {
 #
 cdl_component CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 {
     # Flavor: bool
-    user_value 1
+    user_value 0
     # value_source user
     # Default value: CYGINT_HAL_STM32_UART4>0
     #     CYGINT_HAL_STM32_UART4 == 0
@@ -4615,6 +4679,9 @@ cdl_component CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 {
 # ST STM32 port 4.
 #
 cdl_option CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL4_NAME {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value "\"/dev/ser4\""
@@ -4631,6 +4698,9 @@ cdl_option CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL4_NAME {
 # ST STM32 port 4.
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL4_BAUD {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 115200
@@ -4648,6 +4718,9 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL4_BAUD {
 # for the ST STM32 port 4.
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL4_BUFSIZE {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 128
@@ -4659,6 +4732,9 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL4_BUFSIZE {
 # Interrupt priority for STM32 serial port 4
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL4_INT_PRI {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 128
@@ -4674,7 +4750,7 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL4_INT_PRI {
 #
 cdl_component CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL5 {
     # Flavor: bool
-    user_value 1
+    user_value 0
     # value_source user
     # Default value: CYGINT_HAL_STM32_UART5>0
     #     CYGINT_HAL_STM32_UART5 == 0
@@ -4687,6 +4763,9 @@ cdl_component CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL5 {
 # ST STM32 port 5.
 #
 cdl_option CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL5_NAME {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL5 is disabled
+
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value "\"/dev/ser5\""
@@ -4703,6 +4782,9 @@ cdl_option CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL5_NAME {
 # ST STM32 port 5.
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL5_BAUD {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL5 is disabled
+
     # Flavor: data
     user_value 115200
     # value_source user
@@ -4719,6 +4801,9 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL5_BAUD {
 # for the ST STM32 port 5.
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL5_BUFSIZE {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL5 is disabled
+
     # Flavor: data
     user_value 2048
     # value_source user
@@ -4729,6 +4814,9 @@ cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL5_BUFSIZE {
 # Interrupt priority for STM32 serial port 5
 #
 cdl_option CYGNUM_IO_SERIAL_CORTEXM_STM32_SERIAL5_INT_PRI {
+    # This option is not active
+    # The parent CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL5 is disabled
+
     # Flavor: data
     user_value 128
     # value_source user
@@ -4793,13 +4881,13 @@ cdl_option CYGPRI_SER_TEST_SER_DEV {
     #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL0_NAME == "\"/dev/ser0\""
     #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL1 == 1
     #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL1_NAME == "\"/dev/ser1\""
-    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 == 1
-    #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL2_NAME == "\"/dev/ser2\""
-    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 == 1
-    #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL3_NAME == "\"/dev/ser3\""
-    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 == 1
-    #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL4_NAME == "\"/dev/ser4\""
-    #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL5_NAME == "\"/dev/ser5\""
+    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 == 0
+    #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL2_NAME == 0
+    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 == 0
+    #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL3_NAME == 0
+    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 == 0
+    #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL4_NAME == 0
+    #     CYGDAT_IO_SERIAL_CORTEXM_STM32_SERIAL5_NAME == 0
     #   --> "\"/dev/ser0\""
 };
 
@@ -4813,9 +4901,9 @@ cdl_option CYGPRI_SER_TEST_TTY_DEV {
     # Default value:  CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL0 ? "\"/dev/tty0\"" :  CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL1 ? "\"/dev/tty1\"" :  CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 ? "\"/dev/tty2\"" :  CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 ? "\"/dev/tty3\"" :  CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 ? "\"/dev/tty4\"" :  "\"/dev/tty5\"" 
     #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL0 == 1
     #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL1 == 1
-    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 == 1
-    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 == 1
-    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 == 1
+    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL2 == 0
+    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL3 == 0
+    #     CYGPKG_IO_SERIAL_CORTEXM_STM32_SERIAL4 == 0
     #   --> "\"/dev/tty0\""
 };
 
@@ -5018,6 +5106,8 @@ cdl_package CYGPKG_INFRA {
 
     # The following properties are affected by this value
     # package CYGPKG_HAL
+    #     Requires: CYGPKG_INFRA
+    # package CYGPKG_PDCURSES
     #     Requires: CYGPKG_INFRA
     # package CYGPKG_IO_SPI
     #     Requires: CYGPKG_INFRA CYGPKG_HAL
@@ -5593,6 +5683,10 @@ cdl_option CYGFUN_INFRA_EMPTY_DELETE_FUNCTIONS {
     user_value 0
     # value_source user
     # Default value: 1
+
+    # The following properties are affected by this value
+    # package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+    #     Requires:  CYGFUN_INFRA_EMPTY_DELETE_FUNCTIONS == 0 
 };
 
 # Threshold for valid number of delete calls
@@ -5860,6 +5954,8 @@ cdl_package CYGPKG_KERNEL {
     #                         (CYGHWR_HAL_CORTEXM_FPU_SWITCH == "NONE") 
     # option CYGPKG_HAL_CORTEXM_STM32_TESTS
     #     ActiveIf: CYGPKG_KERNEL
+    # package CYGPKG_PDCURSES
+    #     Requires: CYGPKG_KERNEL
     # option CYGPKG_DEVS_FLASH_SPI_AT25DFXXX_TESTS
     #     ActiveIf: CYGPKG_KERNEL
 };
@@ -6841,6 +6937,10 @@ cdl_component CYGFUN_KERNEL_THREADS_STACK_MEASUREMENT {
     # Default value:  0 != CYGPKG_INFRA_DEBUG 
     #     CYGPKG_INFRA_DEBUG == 0
     #   --> 0
+
+    # The following properties are affected by this value
+    # package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+    #     Requires:  CYGFUN_KERNEL_THREADS_STACK_MEASUREMENT == 1 
 };
 
 # >
@@ -8112,6 +8212,10 @@ cdl_package CYGPKG_MEMALLOC {
     # This value cannot be modified here.
     # Flavor: booldata
     # Current value: 1 current
+
+    # The following properties are affected by this value
+    # package CYGPKG_PDCURSES
+    #     Requires: CYGPKG_MEMALLOC
 };
 
 # >
@@ -8634,6 +8738,8 @@ cdl_package CYGPKG_ISOINFRA {
     # package CYGPKG_LIBC_STRING
     #     Requires: CYGPKG_ISOINFRA
     # package CYGPKG_LIBC_TIME
+    #     Requires: CYGPKG_ISOINFRA
+    # package CYGPKG_PDCURSES
     #     Requires: CYGPKG_ISOINFRA
     # package CYGPKG_IO_FLASH
     #     Requires: CYGPKG_ISOINFRA
@@ -11119,6 +11225,8 @@ cdl_package CYGPKG_LIBC {
     # The following properties are affected by this value
     # component CYGNUM_LIBM_COMPATIBILITY
     #     Requires: CYGPKG_LIBC
+    # package CYGPKG_PDCURSES
+    #     Requires: CYGPKG_LIBC
 };
 
 # >
@@ -11781,6 +11889,10 @@ cdl_package CYGPKG_LIBC_STARTUP {
     # Requires:  CYGINT_LIBC_STARTUP_CONTEXT == 1 
     #     CYGINT_LIBC_STARTUP_CONTEXT == 1
     #   --> 1
+
+    # The following properties are affected by this value
+    # package CYGPKG_PDCURSES
+    #     Requires: CYGPKG_LIBC_STARTUP
 };
 
 # >
@@ -12252,6 +12364,8 @@ cdl_package CYGPKG_LIBC_STDIO {
 
     # The following properties are affected by this value
     # option CYGSEM_LIBM_USE_STDERR
+    #     Requires: CYGPKG_LIBC_STDIO
+    # package CYGPKG_PDCURSES
     #     Requires: CYGPKG_LIBC_STDIO
 };
 
@@ -12753,6 +12867,10 @@ cdl_package CYGPKG_LIBC_STDLIB {
     # Requires: CYGINT_ISO_STRING_STRFUNCS
     #     CYGINT_ISO_STRING_STRFUNCS == 1
     #   --> 1
+
+    # The following properties are affected by this value
+    # package CYGPKG_PDCURSES
+    #     Requires: CYGPKG_LIBC_STDLIB
 };
 
 # >
@@ -13060,6 +13178,10 @@ cdl_package CYGPKG_LIBC_STRING {
     # Requires: CYGPKG_ISOINFRA
     #     CYGPKG_ISOINFRA == current
     #   --> 1
+
+    # The following properties are affected by this value
+    # package CYGPKG_PDCURSES
+    #     Requires: CYGPKG_LIBC_STRING
 };
 
 # >
@@ -14292,6 +14414,8 @@ cdl_package CYGPKG_ERROR {
     #     Requires: CYGPKG_ERROR
     # package CYGPKG_IO_SERIAL
     #     Requires: CYGPKG_ERROR
+    # package CYGPKG_PDCURSES
+    #     Requires: CYGPKG_ERROR
     # package CYGPKG_IO_SERIAL_CORTEXM_STM32
     #     Requires: CYGPKG_ERROR
 };
@@ -14397,6 +14521,231 @@ cdl_option CYGPKG_ERROR_CFLAGS_REMOVE {
 };
 
 # <
+# <
+# PDCurses
+# Public Domain Curses.
+#
+cdl_package CYGPKG_PDCURSES {
+    # Packages cannot be added or removed, nor can their version be changed,
+    # simply by editing their value. Instead the appropriate configuration
+    # should be used to perform these actions.
+
+    # This value cannot be modified here.
+    # Flavor: booldata
+    # Current value: 1 current
+    # Requires: CYGPKG_INFRA
+    #     CYGPKG_INFRA == current
+    #   --> 1
+    # Requires: CYGPKG_KERNEL
+    #     CYGPKG_KERNEL == current
+    #   --> 1
+    # Requires: CYGPKG_MEMALLOC
+    #     CYGPKG_MEMALLOC == current
+    #   --> 1
+    # Requires: CYGPKG_ISOINFRA
+    #     CYGPKG_ISOINFRA == current
+    #   --> 1
+    # Requires: CYGPKG_LIBC
+    #     CYGPKG_LIBC == current
+    #   --> 1
+    # Requires: CYGPKG_LIBC_STARTUP
+    #     CYGPKG_LIBC_STARTUP == current
+    #   --> 1
+    # Requires: CYGPKG_LIBC_STDIO
+    #     CYGPKG_LIBC_STDIO == current
+    #   --> 1
+    # Requires: CYGPKG_LIBC_STDLIB
+    #     CYGPKG_LIBC_STDLIB == current
+    #   --> 1
+    # Requires: CYGPKG_LIBC_STRING
+    #     CYGPKG_LIBC_STRING == current
+    #   --> 1
+    # Requires: CYGPKG_ERROR
+    #     CYGPKG_ERROR == current
+    #   --> 1
+};
+
+# >
+# Build PDCurses demos
+# This option enables the building of the PDCurses demos:
+# firework, newdemo, ptest, rain, testcurs, tuidemo, worm,
+# and xmas.
+# Note: demos build itself as the standalone single-thread
+# executables.
+#
+cdl_option CYGBLD_PDCURSES_DEMOS {
+    # Flavor: bool
+    # No user value, uncomment the following line to provide one.
+    # user_value 0
+    # value_source default
+    # Default value: 0
+    # Requires: CYGINT_PDCURSES_TERMINAL_DRIVER
+    #     CYGINT_PDCURSES_TERMINAL_DRIVER == 1
+    #   --> 1
+
+    # The following properties are affected by this value
+    # option CYGPKG_PDCURSES_TESTS
+    #     Calculated:  (CYGBLD_PDCURSES_DEMOS) ? "tests/firework tests/newdemo tests/ptest tests/rain tests/testcurs tests/tuidemo tests/worm tests/xmas" : "" 
+};
+
+# Build serial driver for PDCurses
+# The PDCurses is a terminfo-less library. To build the curses
+# applications, a port must provide a few set of the PDC port
+# functions to drive the real hardware, read `IMPLEMNT' guide.
+# This driver provides an interaction with terminal program on
+# a specified serial device.
+#
+cdl_component CYGBLD_PDCURSES_TERMINAL_DRIVER_SERIAL {
+    # Flavor: bool
+    # No user value, uncomment the following line to provide one.
+    # user_value 1
+    # value_source default
+    # Default value: 1
+    # Requires: 1 == CYGPKG_IO_SERIAL_DEVICES
+    #     CYGPKG_IO_SERIAL_DEVICES == 1
+    #   --> 1
+};
+
+# >
+# Serial terminal interface for PDCurses
+#
+cdl_interface CYGINT_PDCURSES_TERMINAL_DRIVER {
+    # Implemented by CYGINT_PDCURSES_TERMINAL_DRIVER, active, enabled
+    # This value cannot be modified here.
+    # Flavor: data
+    # Current_value: 1
+    # Requires: 1 == CYGINT_PDCURSES_TERMINAL_DRIVER
+    #     CYGINT_PDCURSES_TERMINAL_DRIVER == 1
+    #   --> 1
+
+    # The following properties are affected by this value
+    # option CYGBLD_PDCURSES_DEMOS
+    #     Requires: CYGINT_PDCURSES_TERMINAL_DRIVER
+    # interface CYGINT_PDCURSES_TERMINAL_DRIVER
+    #     Requires: 1 == CYGINT_PDCURSES_TERMINAL_DRIVER
+};
+
+# Physical serial device
+# This option selects the physical device to use for
+# PDCurses serial terminal driver.
+#
+cdl_option CYGDAT_PDCURSES_DRIVER_SERIAL_DEV {
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value "\"/dev/ser0\""
+    # value_source default
+    # Default value: "\"/dev/ser0\""
+};
+
+# VT100 attributes
+# This option allows the driver to use the VT100 escape
+# sequences, i.e. the attributes such as bold, underline,
+# blink, reverse, etc.
+#
+cdl_option CYGDAT_PDCURSES_DRIVER_USE_VT100_ATTR {
+    # Flavor: bool
+    # No user value, uncomment the following line to provide one.
+    # user_value 1
+    # value_source default
+    # Default value: 1
+};
+
+# ANSI colors
+# This option allows the driver to use the ANSI escape
+# sequences for a coloring (8 values for a foreground and
+# 8 values for a background).
+#
+cdl_option CYGDAT_PDCURSES_DRIVER_USE_ANSI_COLORS {
+    # Flavor: bool
+    # No user value, uncomment the following line to provide one.
+    # user_value 1
+    # value_source default
+    # Default value: 1
+};
+
+# Keypad keys
+# This option provides a minimal support for a curses
+# keypad function (the keypad of the user's terminal).
+#
+cdl_option CYGDAT_PDCURSES_DRIVER_USE_KEYPAD_KEYS {
+    # Flavor: bool
+    # No user value, uncomment the following line to provide one.
+    # user_value 1
+    # value_source default
+    # Default value: 1
+};
+
+# Size of the screen in columns
+# This option sets the size of the screen in columns.
+#
+cdl_option CYGDAT_PDCURSES_DRIVER_SCREEN_COLUMNS {
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value 80
+    # value_source default
+    # Default value: 80
+};
+
+# Size of the screen in rows
+# This option sets the size of the screen in rows.
+#
+cdl_option CYGDAT_PDCURSES_DRIVER_SCREEN_ROWS {
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value 25
+    # value_source default
+    # Default value: 25
+};
+
+# <
+# Build options
+# Package specific build options including control over
+# compiler flags used only in building this package,
+# and details of which tests are built.
+#
+cdl_component CYGPKG_PDCURSES_OPTIONS {
+    # There is no associated value.
+};
+
+# >
+# Additional compiler flags
+# This option modifies the set of compiler flags for
+# building the PDCurses package.
+# These flags are used in addition to the set of global flags.
+#
+cdl_option CYGPKG_PDCURSES_CFLAGS_ADD {
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value "-D__ECOS__ -D_LP64=0 -DHAVE_VSNPRINTF -DHAVE_VSSCANF"
+    # value_source default
+    # Default value: "-D__ECOS__ -D_LP64=0 -DHAVE_VSNPRINTF -DHAVE_VSSCANF"
+};
+
+# Suppressed compiler flags
+# This option modifies the set of compiler flags for
+# building the PDCurses package.
+# These flags are removed from the set of global flags
+# if present.
+#
+cdl_option CYGPKG_PDCURSES_CFLAGS_REMOVE {
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value ""
+    # value_source default
+    # Default value: ""
+};
+
+# <
+# PDCurses tests
+# This option specifies the set of tests for the PDCurses.
+#
+cdl_option CYGPKG_PDCURSES_TESTS {
+    # Calculated value:  (CYGBLD_PDCURSES_DEMOS) ? "tests/firework tests/newdemo tests/ptest tests/rain tests/testcurs tests/tuidemo tests/worm tests/xmas" : "" 
+    #     CYGBLD_PDCURSES_DEMOS == 0
+    # Flavor: data
+    # Current_value: 
+};
+
 # <
 # SPI support
 # doc: ref/io-spi.html
@@ -14528,9 +14877,8 @@ cdl_component CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS1 {
 #
 cdl_option CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS1_CS_GPIOS {
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value "SPI_CS(A, 4)"
-    # value_source default
+    user_value "SPI_CS(A, 1)"
+    # value_source user
     # Default value: "SPI_CS(A, 4)"
 };
 
@@ -14576,9 +14924,8 @@ cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS1_RXINTR_PRI {
 #
 cdl_component CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS2 {
     # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
+    user_value 1
+    # value_source user
     # Default value: 0
 };
 
@@ -14590,13 +14937,9 @@ cdl_component CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS2 {
 # 
 #
 cdl_option CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS2_CS_GPIOS {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS2 is disabled
-
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value "SPI_CS(B, 12)"
-    # value_source default
+    user_value "SPI_CS(B, 12)"
+    # value_source user
     # Default value: "SPI_CS(B, 12)"
 };
 
@@ -14608,9 +14951,6 @@ cdl_option CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS2_CS_GPIOS {
 # 
 #
 cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS2_BBUF_SIZE {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS2 is disabled
-
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 0
@@ -14621,9 +14961,6 @@ cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS2_BBUF_SIZE {
 # Transmit DMA interrupt priority
 #
 cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS2_TXINTR_PRI {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS2 is disabled
-
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 71
@@ -14634,9 +14971,6 @@ cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS2_TXINTR_PRI {
 # Receive DMA interrupt priority
 #
 cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS2_RXINTR_PRI {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS2 is disabled
-
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 136
@@ -14654,9 +14988,8 @@ cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS2_RXINTR_PRI {
 #
 cdl_component CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3 {
     # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
+    user_value 1
+    # value_source user
     # Default value: 0
 };
 
@@ -14667,9 +15000,6 @@ cdl_component CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3 {
 # 
 #
 cdl_option CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3_DISABLE_DEBUG_PORT {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3 is disabled
-
     # Flavor: bool
     # No user value, uncomment the following line to provide one.
     # user_value 0
@@ -14684,13 +15014,9 @@ cdl_option CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3_DISABLE_DEBUG_PORT {
 # 
 #
 cdl_option CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3_CS_GPIOS {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3 is disabled
-
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value "SPI_CS(A, 15)"
-    # value_source default
+    user_value "SPI_CS(D, 2)"
+    # value_source user
     # Default value: "SPI_CS(A, 15)"
 };
 
@@ -14702,9 +15028,6 @@ cdl_option CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3_CS_GPIOS {
 # 
 #
 cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS3_BBUF_SIZE {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3 is disabled
-
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 0
@@ -14715,9 +15038,6 @@ cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS3_BBUF_SIZE {
 # Transmit DMA interrupt priority
 #
 cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS3_TXINTR_PRI {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3 is disabled
-
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 73
@@ -14728,9 +15048,6 @@ cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS3_TXINTR_PRI {
 # Receive DMA interrupt priority
 #
 cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS3_RXINTR_PRI {
-    # This option is not active
-    # The parent CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS3 is disabled
-
     # Flavor: data
     # No user value, uncomment the following line to provide one.
     # user_value 138
@@ -14745,9 +15062,8 @@ cdl_option CYGNUM_DEVS_SPI_CORTEXM_STM32_BUS3_RXINTR_PRI {
 #
 cdl_component CYGHWR_DEVS_SPI_CORTEXM_STM32_BUS4 {
     # Flavor: bool
-    # No user value, uncomment the following line to provide one.
-    # user_value 0
-    # value_source default
+    user_value 0
+    # value_source user
     # Default value: 0
 };
 
@@ -15059,6 +15375,8 @@ cdl_package CYGPKG_IO_FLASH {
     # The following properties are affected by this value
     # option CYGHWR_HAL_CORTEXM_STM32_FLASH
     #     ActiveIf: CYGPKG_IO_FLASH
+    # package CYGPKG_DEVS_FLASH_STM32
+    #     ActiveIf: CYGPKG_IO_FLASH
     # package CYGPKG_DEVS_FLASH_SPI_AT25DFXXX
     #     ActiveIf:  CYGPKG_IO_FLASH && CYGPKG_IO_SPI 
 };
@@ -15070,12 +15388,13 @@ cdl_package CYGPKG_IO_FLASH {
 # at least one device.
 #
 cdl_interface CYGHWR_IO_FLASH_DEVICE {
+    # Implemented by CYGPKG_DEVS_FLASH_STM32, active, enabled
     # Implemented by CYGPKG_DEVS_FLASH_SPI_AT25DFXXX, active, enabled
     # This value cannot be modified here.
     # Flavor: data
-    # Current_value: 1
+    # Current_value: 2
     # Requires:  CYGHWR_IO_FLASH_DEVICE >= 1 
-    #     CYGHWR_IO_FLASH_DEVICE == 1
+    #     CYGHWR_IO_FLASH_DEVICE == 2
     #   --> 1
 
     # The following properties are affected by this value
@@ -15174,8 +15493,8 @@ cdl_option CYGSEM_IO_FLASH_READ_INDIRECT {
     # value_source default
     # Default value: 0
     # Requires:  !CYGSEM_IO_FLASH_VERIFY_PROGRAM 
-    #     CYGSEM_IO_FLASH_VERIFY_PROGRAM == 0
-    #   --> 1
+    #     CYGSEM_IO_FLASH_VERIFY_PROGRAM == 1
+    #   --> 0
 };
 
 # Display status messages during flash operations
@@ -15195,11 +15514,10 @@ cdl_option CYGSEM_IO_FLASH_CHATTER {
 # programmed to flash.
 #
 cdl_option CYGSEM_IO_FLASH_VERIFY_PROGRAM {
-    # This option is not active
     # ActiveIf constraint:  CYGHWR_IO_FLASH_INDIRECT_READS < CYGHWR_IO_FLASH_DEVICE 
     #     CYGHWR_IO_FLASH_INDIRECT_READS == 1
-    #     CYGHWR_IO_FLASH_DEVICE == 1
-    #   --> 0
+    #     CYGHWR_IO_FLASH_DEVICE == 2
+    #   --> 1
 
     # Flavor: bool
     # No user value, uncomment the following line to provide one.
@@ -15894,6 +16212,110 @@ cdl_option CYGHWR_HAL_CORTEXM_STM32_FLASH {
     # Default value: 1
 };
 
+# STM32 FLASH memory support
+# Flash memory support for on-chip flash on STM32 devices and compatibles.
+# This driver implements the V2 flash driver API.
+#
+cdl_package CYGPKG_DEVS_FLASH_STM32 {
+    # Packages cannot be added or removed, nor can their version be changed,
+    # simply by editing their value. Instead the appropriate configuration
+    # should be used to perform these actions.
+
+    # ActiveIf constraint: CYGPKG_IO_FLASH
+    #     CYGPKG_IO_FLASH == current
+    #   --> 1
+
+    # This value cannot be modified here.
+    # Flavor: booldata
+    # Current value: 1 current
+};
+
+# >
+# Number of words to write per burst
+# On typical hardware programming the flash requires disabling
+# interrupts for an extended period of time.
+# Some or all of the flash hardware will be unusable while each word
+# is programmed, and disabling interrupts is the only reliable
+# way of ensuring that no interrupt handler or other thread will
+# try to access the flash in the middle of an operation. This
+# can have a major impact on the real-time responsiveness of
+# typical applications. To ameliorate this the driver will
+# perform writes in small bursts, briefly re-enabling the cache
+# and interrupts between each burst. The number of write operations
+# per burst is determined by this option: reducing the number of
+# writes per burst will improve real-time response, but will add
+# overhead so the actual flash program operation will take
+# longer; conversely more writes per burst will worsen response
+# times but reduce overhead.
+#
+cdl_option CYGNUM_DEVS_FLASH_STM32_V2_PROGRAM_BURST_SIZE {
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value 256
+    # value_source default
+    # Default value: 256
+    # Legal values: 4 to 4096
+};
+
+# Program/erase parallelism
+# The Flash interface of the STM32 F2 and F4 families can program or erase
+# multiple bits in one step. The maximum possible parallelism depends
+# on the supply voltage. The default value of this option (32)
+# corresponds to supply voltage of 2.7 - 3.6V, but another value
+# may be chosen if a different voltage is used.
+#
+cdl_option CYGNUM_DEVS_FLASH_STM32_PARALLELISM {
+    # ActiveIf constraint:  ((CYGHWR_HAL_CORTEXM_STM32_FAMILY == "F2") || (CYGHWR_HAL_CORTEXM_STM32_FAMILY == "F4")) 
+    #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
+    #     CYGHWR_HAL_CORTEXM_STM32_FAMILY == F4
+    #   --> 1
+
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value 32
+    # value_source default
+    # Default value: 32
+    # Legal values:  8 16 32 64 
+};
+
+# STM32 driver build options
+# Package specific build options including control over
+# compiler flags used only in building the STM32
+# flash driver, and details of which tests are built.
+#
+cdl_component CYGPKG_DEVS_FLASH_STM32_OPTIONS {
+    # There is no associated value.
+};
+
+# >
+# Additional compiler flags
+# This option modifies the set of compiler flags for
+# building the STM32 flash driver. These flags
+# are used in addition to the set of global flags.
+#
+cdl_option CYGPKG_DEVS_FLASH_STM32_CFLAGS_ADD {
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value ""
+    # value_source default
+    # Default value: ""
+};
+
+# Suppressed compiler flags
+# This option modifies the set of compiler flags for
+# building the STM32 flash driver. These flags
+# are removed from the set of global flags if present.
+#
+cdl_option CYGPKG_DEVS_FLASH_STM32_CFLAGS_REMOVE {
+    # Flavor: data
+    # No user value, uncomment the following line to provide one.
+    # user_value ""
+    # value_source default
+    # Default value: ""
+};
+
+# <
+# <
 # Atmel AT25DFxxx flash memory support
 # Flash memory support for Atmel AT95DFxxx SPI flash devices
 # and compatibles.  This driver implements the V2 flash driver API.
@@ -16099,6 +16521,10 @@ cdl_option CYGHWR_DEVS_I2C_CORTEXM_STM32_MULTIPLE_BUSES {
     user_value 1
     # value_source user
     # Default value: 0
+
+    # The following properties are affected by this value
+    # package CYGPKG_HAL_CORTEXM_STM32_STM32F4KEYSTONE
+    #     Requires:  CYGHWR_DEVS_I2C_CORTEXM_STM32_MULTIPLE_BUSES == 1 
 };
 
 # Driver debug output level
