@@ -54,7 +54,7 @@ public:
     static cWS281xDriver *get();
 
     void resetPixels();
-    void setPixel(cyg_uint32 count, cRGB color);
+    void setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color);
     void paint();
 
     static void paint(cTerm & t,int argc,char **argv);

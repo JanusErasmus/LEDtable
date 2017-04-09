@@ -170,12 +170,25 @@ void setStringColor(cyg_uint8 *buffer, cyg_uint8 string, cRGB color)
     setString(&buffer[16]   , string, color.B);
 }
 
-void cWS281xDriver::setPixel(cyg_uint32 count, cRGB color)
+void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
 {
 
-     cyg_uint8 *buffer = &mBuffer[(count * 24) ];
-     setStringColor(buffer, 5, color);
+	cyg_uint8 string = x/2;
+	cyg_uint8 count = y;
 
+	if(x%2)
+	{
+		count = 31;
+		count -= y;
+	}
+	string += 5;
+//	diag_printf("string %d, count %d\n", string, count);
+
+     cyg_uint8 *buffer = &mBuffer[(count * 24) ];
+     setStringColor(buffer, string, color);
+
+     mBuffer[0] = 0;
+     mBuffer[1] = 0;
 }
 
 void cWS281xDriver::paint()
@@ -184,7 +197,6 @@ void cWS281xDriver::paint()
 	HAL_READ_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CR1, TIM_CR);
     TIM_CR &= ~(CYGHWR_HAL_STM32_TIM_CR1_CEN);
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CR1, TIM_CR);
-
 
 
 //    PRINT_REG(DMA_CONTROLLER_REG, CYGHWR_HAL_STM32_DMA_SM0AR( 6 ));
@@ -203,7 +215,7 @@ void cWS281xDriver::paint()
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CNT, reg32);
 
 //	HAL_WRITE_UINT32(WS281x_ODR, reg32);
-//	cyg_thread_delay(10);
+//	cyg_thread_delay(1);
 
 
 	reg32 = mBitCount;

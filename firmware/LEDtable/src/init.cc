@@ -15,6 +15,7 @@
 #include "output_port.h"
 #include "spi_dev.h"
 #include "ws281x_driver.h"
+#include "runner.h"
 
 #define TRACE(_x, ...) INFO_TRACE("cInit", _x,  ##__VA_ARGS__)
 
@@ -53,7 +54,7 @@ void cInit::init_thread(cyg_addrword_t args)
             CYGHWR_HAL_STM32_PIN_OUT(C,  5, OPENDRAIN, NONE, 2MHZ),
             CYGHWR_HAL_STM32_PIN_OUT(C,  6, OPENDRAIN, NONE, 2MHZ),
     };
-    cWS281xDriver::init(cWS281xDriver::WS2812, 58, outputPortNumbers, 2);
+    cWS281xDriver::init(cWS281xDriver::WS2812, 32, outputPortNumbers, 2);
 
 
 
@@ -61,57 +62,29 @@ void cInit::init_thread(cyg_addrword_t args)
 
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
 
-    cRGB off(0x0,0x0,0x0);
-    cRGB white(255,255,255);
-    cRGB blue(0x00, 0x00, 0xFF);
-    cRGB red(0xFF, 0x00, 0x00);
-    cRGB green(0x00, 0xFF, 0x00);
-    cRGB mix1(0xFF, 0xFF, 0x00);
-    cRGB mix2(0xFF, 0x00, 0xFF);
-    cRGB mix3(0x00, 0xFF, 0xFF);
 
-    cyg_uint8 cColor = 0;
-    cRGB *pColor[] = {&off, &red, &green, &blue, &white, &mix1, &mix2, &mix3};
+    Runner string1(59);
+//    string2.setStart(28);
 
-    cRGB color(0x02, 0x81, 0x81);
+    cRGB color(0x00, 0x8F, 0x00);
+    cRGB red(0xFF, 0, 0);
+    cRGB off(0, 0, 0);
 
-    cWS281xDriver::get()->setPixel(0, color);
-    cWS281xDriver::get()->setPixel(1, color);
-    cWS281xDriver::get()->setPixel(57, color);
-//    cWS281xDriver::get()->paint();
+    cRGB white(100, 20, 0);//(159, 0, 80);//(0x7, 0x7, 0x7);
 
-    cyg_uint8 ledCount = 57;
-    cyg_int8 diff = 1;
-    cyg_int8 cnt = 0;
+
+//	cWS281xDriver::get()->setPixel(5, 30, red);
+
+
     while(1)
     {
+    	string1.run();
 
-        cWS281xDriver::get()->setPixel(cnt, *pColor[cColor]);
-        cWS281xDriver::get()->paint();
-        cyg_thread_delay(5);
-		cWS281xDriver::get()->setPixel(cnt, off);
+    	cWS281xDriver::get()->paint();
+    	cyg_thread_delay(5);
+    	string1.next();
 
-        cnt+= diff;
 
-        if(cnt > ledCount)
-        {
-        	diff = -1;
-        	cnt = ledCount - 1;
-
-        	cColor++;
-        }
-        else if(cnt < 0)
-        {
-        	diff = 1;
-        	cnt = 0;
-
-        	cColor++;
-        }
-
-    	if(cColor > 8)
-    		cColor = 1;
-
-//		diag_printf("%d\n", cnt);
     }
 }
 
