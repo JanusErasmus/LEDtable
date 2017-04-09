@@ -19,21 +19,6 @@ Runner::Runner(cyg_uint8 count)
 	cColor = 1;
 }
 
-cRGB off(0x0,0x0,0x0);
-cRGB white(255,255,255);
-cRGB blue(0x00, 0x00, 0xFF);
-cRGB red(0xFF, 0x00, 0x00);
-cRGB green(0x00, 0xFF, 0x00);
-cRGB mix1(0xFF, 0xFF, 0x00);
-cRGB mix2(0xFF, 0x00, 0xFF);
-cRGB mix3(0x00, 0xFF, 0xFF);
-//cRGB gray(0x80, 0x80, 0x80);
-cRGB orange(179, 89, 0);
-cRGB pink(159, 0, 80);
-
-cyg_uint8 cColor = 0;
-cRGB *pColor[] = {&off, &blue, &green, &red, &green, &white, &mix3, &green, &orange, &mix1, &orange, &pink, &green, &mix2, &mix3, &orange, &pink, 0};
-
 void Runner::run()
 {
     cWS281xDriver::get()->setPixel(mX, mY, *pColor[cColor]);
@@ -41,7 +26,6 @@ void Runner::run()
 
 void Runner::next()
 {
-
 	mY += mDiff;
 
 	if(mY >= 16)
@@ -85,6 +69,8 @@ void Runner::next()
 
 	if(!pColor[cColor])
 		cColor = 0;
+
+//	diag_printf("%d, %d\n", mX, mY);
 }
 
 Runner::~Runner() {

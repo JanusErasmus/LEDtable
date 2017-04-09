@@ -21,7 +21,6 @@
 #define CC_TIMER_RCC        CYGHWR_HAL_STM32_CLOCK(APB2, TIM1)
 #define CC_TIMER            CYGHWR_HAL_STM32_TIM1
 
-
 class cWS281xDriver
 {
 public:
@@ -37,10 +36,7 @@ private:
     cyg_uint32 mBitCount;
     cyg_uint32 mPixelCount;
 
-    cyg_uint32 mAutoReload;
-    cyg_uint32 mRefreshAutoReload;
-
-    void getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount, cyg_uint32 &refreshReload);
+    void getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount);
     void setupTimer(cyg_uint32 clockSpeed);
     void setupDMA();
     void setupDMA_MEM2MEM();

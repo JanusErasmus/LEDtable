@@ -29,7 +29,7 @@ cWS281xDriver *cWS281xDriver::get()
 cWS281xDriver::cWS281xDriver(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count)
 {
     mPixelCount = pixel_count + 1;
-    mBitCount = (24 * mPixelCount) ;
+    mBitCount = (24 * mPixelCount);
 
     mBuffer = (cyg_uint8*)malloc(mBitCount + 8);
     resetPixels();
@@ -90,7 +90,7 @@ void cWS281xDriver::setupDMA_MEM2MEM()
 
 extern cyg_uint32 hal_stm32_pclk2;
 
-void cWS281xDriver::getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount, cyg_uint32 &refreshReload)
+void cWS281xDriver::getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, cyg_uint32 &setCount, cyg_uint32 &resetCount)
 {
     float TIM1tick = 1.0 / ( (float)hal_stm32_pclk2);
     float TIM1_ARRvalue = ( (float)hal_stm32_pclk2) / (float)clockSpeed;
@@ -107,30 +107,27 @@ void cWS281xDriver::getConstants(cyg_uint32 clockSpeed, cyg_uint32 &autoReload, 
         resetCount = (float)500e-9 / TIM1tick;
     }
 
-
-    refreshReload = (((float)19e-3 - ((float)mBitCount / (float)clockSpeed)) / 40) / TIM1tick;
 }
 
 void cWS281xDriver::setupTimer(cyg_uint32 clockSpeed)
 {
-    cyg_uint32 reg32, setCount, resetCount;
+    cyg_uint32 reg32, setCount, resetCount, autoReload;
 
-    getConstants(clockSpeed, mAutoReload, setCount, resetCount, mRefreshAutoReload);
+    getConstants(clockSpeed, autoReload, setCount, resetCount);
 
     TRACE("TIM1 Setup:\n");
-    TRACE(" - ARR    : 0x%08X\n", mAutoReload);
+    TRACE(" - ARR    : 0x%08X\n", autoReload);
     TRACE(" - SET    : 0x%08X\n", setCount);
     TRACE(" - RESET  : 0x%08X\n", resetCount);
-    TRACE(" - refresh: 0x%08X\n", mRefreshAutoReload);
 
     CYGHWR_HAL_STM32_CLOCK_ENABLE(CC_TIMER_RCC);
 
 //----------------- Setup timer frequency --------------------------------------
-    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_ARR, mAutoReload);
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_ARR, autoReload);
 
-    reg32 = 1;
-    //----------------- Setup reset timing for a ONE ------------------------------
-        HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR3, reg32);
+//----------------- Setup reset timing for a ONE ------------------------------
+    reg32 = 10;
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR3, reg32);
 
 //----------------- Setup pixel reset trigger when ZERO ------------------------
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR1, setCount);
@@ -138,7 +135,7 @@ void cWS281xDriver::setupTimer(cyg_uint32 clockSpeed)
 //----------------- Setup reset timing for a ONE ------------------------------
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR2, resetCount);
 
-    reg32 =
+    reg32 = (1 << 1) |
             (1 << 11)                        |   //update DMA request
             (1 << 9)                        |   //CC1 DMA request
             (1 << 10);                          //CC2 DMA request
@@ -165,9 +162,9 @@ void setString(cyg_uint8 *buffer, cyg_uint8 string, cyg_uint8 colorByte)
 
 void setStringColor(cyg_uint8 *buffer, cyg_uint8 string, cRGB color)
 {
-    setString(buffer        , string, color.G);
-    setString(&buffer[8]    , string, color.R);
-    setString(&buffer[16]   , string, color.B);
+    setString(buffer        , string, color.G );
+    setString(&buffer[8]    , string, color.R );
+    setString(&buffer[16]   , string, color.B );
 }
 
 void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
@@ -184,11 +181,9 @@ void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
 	string += 5;
 //	diag_printf("string %d, count %d\n", string, count);
 
-     cyg_uint8 *buffer = &mBuffer[(count * 24) ];
+     cyg_uint8 *buffer = &mBuffer[(count * 24)];
      setStringColor(buffer, string, color);
 
-     mBuffer[0] = 0;
-     mBuffer[1] = 0;
 }
 
 void cWS281xDriver::paint()
@@ -198,33 +193,38 @@ void cWS281xDriver::paint()
     TIM_CR &= ~(CYGHWR_HAL_STM32_TIM_CR1_CEN);
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CR1, TIM_CR);
 
+    cyg_uint32 reg32;
+//    do
+//    {
+//       HAL_READ_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SCR( DMA_RESET_STREAM ), reg32);
+//    }while(reg32 & CYGHWR_HAL_STM32_DMA_CCR_EN);
 
 //    PRINT_REG(DMA_CONTROLLER_REG, CYGHWR_HAL_STM32_DMA_SM0AR( 6 ));
 //    PRINT_REG(DMA_CONTROLLER_REG, CYGHWR_HAL_STM32_DMA_SM0AR( DMA_BUFFER_STREAM ));
 //    PRINT_REG(DMA_CONTROLLER_REG, CYGHWR_HAL_STM32_DMA_SM0AR( DMA_RESET_STREAM ));
 
-	cyg_uint32 reg32 = 0xFFFFFFFF;
-	HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_LIFCR, reg32);
-	HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_HIFCR, reg32);
-
 	HAL_READ_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_SR, reg32);
 	reg32 = 0;
 	HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_SR, reg32);
-
-	reg32 = 0;
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CNT, reg32);
 
-//	HAL_WRITE_UINT32(WS281x_ODR, reg32);
-//	cyg_thread_delay(1);
 
+    reg32 = 0xFFFFFFFF;
+    HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_LIFCR, reg32);
+    HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_HIFCR, reg32);
+
+//	HAL_WRITE_UINT32(WS281x_ODR, reg32);
+	cyg_thread_delay(1);
+
+    reg32 = 0xFFFFFFFF;
+    HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_LIFCR, reg32);
+    HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_HIFCR, reg32);
 
 	reg32 = mBitCount;
 	HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SNDTR( DMA_RESET_STREAM ), reg32);
-
-	reg32 = mBitCount;
 	HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SNDTR( DMA_UPDATE_STREAM ), reg32);
 	HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SNDTR( DMA_BUFFER_STREAM ), reg32);
-	HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SM0AR( DMA_BUFFER_STREAM ), (cyg_uint32)mBuffer);
+    HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SM0AR( DMA_BUFFER_STREAM ), (cyg_uint32)mBuffer);
 
 
 	cyg_uint32 CR;
@@ -235,7 +235,6 @@ void cWS281xDriver::paint()
 	HAL_READ_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SCR( DMA_RESET_STREAM ), CR);
 	CR |= CYGHWR_HAL_STM32_DMA_CCR_EN;
 	HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SCR( DMA_RESET_STREAM ), CR);
-
 
 	HAL_READ_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SCR( DMA_BUFFER_STREAM ), CR);
 	CR |= CYGHWR_HAL_STM32_DMA_CCR_EN;

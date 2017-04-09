@@ -16,6 +16,7 @@
 #include "spi_dev.h"
 #include "ws281x_driver.h"
 #include "runner.h"
+#include "Spiral.h"
 
 #define TRACE(_x, ...) INFO_TRACE("cInit", _x,  ##__VA_ARGS__)
 
@@ -63,27 +64,44 @@ void cInit::init_thread(cyg_addrword_t args)
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
 
 
-    Runner string1(59);
-//    string2.setStart(28);
+    Spiral string1(3, 12, 3, 15, 0, 12);
+    Spiral string2(3, 8 , 3, 11, 0, 8);
+    string2.startColor(6);
+    Spiral string3(3, 4 , 3, 7 , 0, 4);
+    string3.startColor(2);
+    Spiral string4(3, 0 , 3, 3 , 0, 0);
+    string4.startColor(4);
+//    Runner string1(59);
 
-    cRGB color(0x00, 0x8F, 0x00);
+    cRGB color(0x00, 0xFF, 0x00);
     cRGB red(0xFF, 0, 0);
     cRGB off(0, 0, 0);
 
+
+    cRGB blue(0x00, 0, 0x80);
+
     cRGB white(100, 20, 0);//(159, 0, 80);//(0x7, 0x7, 0x7);
 
+//    cWS281xDriver::get()->setPixel(0, 0, cRGB(0x00, 0x80, 0x00));
+//    cWS281xDriver::get()->setPixel(1, 0, cRGB(0x00, 0x80, 0x00));
+//    cWS281xDriver::get()->setPixel(2, 0, cRGB(0x00, 0x00, 0x80));
+//    cWS281xDriver::get()->setPixel(0, 10, cRGB(0x00, 0x00, 0x80));
+//    cWS281xDriver::get()->paint();
 
-//	cWS281xDriver::get()->setPixel(5, 30, red);
 
 
     while(1)
     {
-    	string1.run();
-
-    	cWS281xDriver::get()->paint();
-    	cyg_thread_delay(5);
-    	string1.next();
-
+       string1.run();
+       string2.run();
+       string3.run();
+       string4.run();
+       cWS281xDriver::get()->paint();
+       cyg_thread_delay(5);
+       string1.next();
+       string2.next();
+       string3.next();
+       string4.next();
 
     }
 }
