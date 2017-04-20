@@ -107,9 +107,8 @@ cdl_component CYGBLD_GLOBAL_OPTIONS {
 #
 cdl_option CYGBLD_GLOBAL_COMMAND_PREFIX {
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value arm-eabi
-    # value_source default
+    user_value arm-none-eabi
+    # value_source user
     # Default value: arm-eabi
 };
 
@@ -120,9 +119,8 @@ cdl_option CYGBLD_GLOBAL_COMMAND_PREFIX {
 #
 cdl_option CYGBLD_GLOBAL_CFLAGS {
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings -mcpu=cortex-m3 -mthumb -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions"
-    # value_source default
+    user_value "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings -mcpu=cortex-m3 -mthumb -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions"
+    # value_source user
     # Default value:  CYGBLD_GLOBAL_WARNFLAGS . "-mcpu=cortex-m3 -mthumb -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions" 
     #     CYGBLD_GLOBAL_WARNFLAGS == "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings "
     #   --> "-Wall -Wpointer-arith -Wstrict-prototypes -Wundef -Woverloaded-virtual -Wno-write-strings -mcpu=cortex-m3 -mthumb -g -O2 -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions"
@@ -244,9 +242,8 @@ cdl_option CYGBLD_GLOBAL_CFLAGS {
 #
 cdl_option CYGBLD_GLOBAL_LDFLAGS {
     # Flavor: data
-    # No user value, uncomment the following line to provide one.
-    # user_value "-mcpu=cortex-m3 -mthumb -Wl,--gc-sections -Wl,-static -Wl,-n -g -nostdlib"
-    # value_source default
+    user_value "-mcpu=cortex-m3 -mthumb -Wl,--gc-sections -Wl,-static -Wl,-n -g -nostdlib"
+    # value_source user
     # Default value: "-mcpu=cortex-m3 -mthumb -Wl,--gc-sections -Wl,-static -Wl,-n -g -nostdlib"
 
     # The following properties are affected by this value
