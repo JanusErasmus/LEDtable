@@ -15,7 +15,7 @@
 #include "output_port.h"
 #include "spi_dev.h"
 #include "ws281x_driver.h"
-#include "runner.h"
+#include "Runner.h"
 #include "Spiral.h"
 
 #define TRACE(_x, ...) INFO_TRACE("cInit", _x,  ##__VA_ARGS__)
@@ -59,7 +59,7 @@ void cInit::init_thread(cyg_addrword_t args)
 
 
 
-//    initFlash();
+    initFlash();
 
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
 
