@@ -9815,11 +9815,10 @@ cdl_interface CYGINT_ISO_STRING_LOCALE_FUNCS {
 #
 cdl_option CYGBLD_ISO_STRING_LOCALE_FUNCS_HEADER {
     # Flavor: booldata
-    # No user value, uncomment the following line to provide one.
-    # user_value 0 0
+    user_value 1 <cyg/libc/string/string.h>
     # The inferred value should not be edited directly.
     inferred_value 1 <cyg/libc/string/string.h>
-    # value_source inferred
+    # value_source user
     # Default value: 0 0
 
     # The following properties are affected by this value

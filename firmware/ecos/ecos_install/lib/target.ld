@@ -2,24 +2,15 @@ STARTUP(vectors.o)
 ENTRY(reset_vector)
 INPUT(extras.o)
 GROUP(libtarget.a libgcc.a libsupc++.a)
-
 MEMORY
 {
     ram : ORIGIN = 0x20000000, LENGTH = 0x00020000-4096
     flash : ORIGIN = 0x08000000, LENGTH = 0x00100000
 }
-
 hal_vsr_table = 0x20000000;
 hal_virtual_vector_table = hal_vsr_table + 85*4;
-
 hal_virtual_vector_table_end = hal_virtual_vector_table + 64*4;
-
-
-
-
-
 hal_startup_stack = 0x20000000 + 1024*128;
-
 SECTIONS
 {
     .debug_aranges 0 : { *(.debug_aranges) } .debug_pubnames 0 : { *(.debug_pubnames) } .debug_info 0 : { *(.debug_info) } .debug_abbrev 0 : { *(.debug_abbrev) } .debug_line 0 : { *(.debug_line) } .debug_frame 0 : { *(.debug_frame) } .debug_str 0 : { *(.debug_str) } .debug_loc 0 : { *(.debug_loc) } .debug_macinfo 0 : { *(.debug_macinfo) } .note.arm.ident 0 : { KEEP (*(.note.arm.ident)) } /DISCARD/ 0 : { *(.fini_array*) }

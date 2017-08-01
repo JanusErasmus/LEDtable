@@ -15,6 +15,7 @@
 #include "output_port.h"
 #include "spi_dev.h"
 #include "ws281x_driver.h"
+
 #include "BigSpiralAnimation.h"
 #include "ColorAnimation.h"
 #include "GoombaAnimation.h"
@@ -66,7 +67,7 @@ void cInit::init_thread(cyg_addrword_t args)
     cWS281xDriver::init(cWS281xDriver::WS2812, 32, outputPortNumbers, 8);
 
 
-//    initFlash();
+    initFlash();
 
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
 
