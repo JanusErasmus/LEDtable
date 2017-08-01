@@ -49,11 +49,13 @@ public:
     static void init(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count);
     static cWS281xDriver *get();
 
+
+    void setAll(cRGB color);
     void resetPixels();
     void setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color);
     void paint();
 
-    static void paint(cTerm & t,int argc,char **argv);
+    static void paintDebug(cTerm & t,int argc,char *argv[]);
 };
 
 extern const TermCMD::cmd_list_t wsCommands[];

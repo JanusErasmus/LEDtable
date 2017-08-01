@@ -10,9 +10,8 @@
 #include "Runner.h"
 #include "ws281x_driver.h"
 
-Runner::Runner(cyg_uint8 count)
+Runner::Runner()
 {
-	mLedCount = count;
 	mDiff = 1;
 	mY = 0;
 	mX = 0;
@@ -42,7 +41,7 @@ void Runner::next()
 		mY += mDiff;
 	}
 
-	if((mX == 3) && (mY == 4))
+	if((mX >= 16) || (mY >= 16))
 	{
 		mDiff = 1;
 		mX = 0;
@@ -73,7 +72,7 @@ void Runner::next()
 //	diag_printf("%d, %d\n", mX, mY);
 }
 
-Runner::~Runner() {
-	// TODO Auto-generated destructor stub
+Runner::~Runner()
+{
 }
 

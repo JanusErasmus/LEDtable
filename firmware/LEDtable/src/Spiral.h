@@ -18,12 +18,6 @@ public:
    Direction(cyg_int8 xDiff, cyg_int8 yDiff) : mXdiff(xDiff), mYdiff(yDiff){};
 };
 
-static Direction DirectionUp = Direction(0,1);
-static Direction DirectionDown = Direction(0,-1);
-static Direction DirectionLeft = Direction(1,0);
-static Direction DirectionRight = Direction(-1,0);
-static Direction *Directions[] = {&DirectionUp, &DirectionRight, &DirectionDown, &DirectionLeft, 0};
-
 class Spiral
 {
    cyg_uint8 mXstart, mYstart;
@@ -41,7 +35,12 @@ class Spiral
    cyg_bool collide(cyg_uint8 currentX, cyg_uint8 currentY, Direction *direction);
 
 public:
-   Spiral(cyg_uint8 Xstart, cyg_uint8 Ystart, cyg_uint8 XtopMargin, cyg_uint8 YtopMargin, cyg_uint8 XbottomMargin, cyg_uint8 YbottomMargin);
+   Spiral(cyg_uint8 Xstart,
+         cyg_uint8 Ystart,
+         cyg_uint8 XtopMargin,
+         cyg_uint8 YtopMargin,
+         cyg_uint8 XbottomMargin,
+         cyg_uint8 YbottomMargin);
    virtual ~Spiral();
 
    void run();

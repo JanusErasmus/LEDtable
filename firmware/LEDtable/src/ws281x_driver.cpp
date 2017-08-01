@@ -48,6 +48,18 @@ void cWS281xDriver::resetPixels()
     memset(mBuffer, 0x00, mBitCount + 8);
 }
 
+
+void cWS281xDriver::setAll(cRGB color)
+{
+   for(cyg_uint8 x = 0; x < 16; x++)
+   {
+      for(cyg_uint8 y = 0; y < 16; y++)
+      {
+         setPixel(x, y, color);
+      }
+   }
+}
+
 void cWS281xDriver::setupDMA_MEM2MEM()
 {
     CYGHWR_HAL_STM32_CLOCK_ENABLE(DMA_CONTROLLER_RCC);
@@ -162,26 +174,57 @@ void setString(cyg_uint8 *buffer, cyg_uint8 string, cyg_uint8 colorByte)
 
 void setStringColor(cyg_uint8 *buffer, cyg_uint8 string, cRGB color)
 {
-    setString(buffer        , string, color.G );
-    setString(&buffer[8]    , string, color.R );
-    setString(&buffer[16]   , string, color.B );
+    setString(buffer        , string, (color.G & 0xFF) >> 2 );
+    setString(&buffer[8]    , string, (color.R & 0xFF) >> 2 );
+    setString(&buffer[16]   , string, (color.B & 0xFF) >> 2 );
 }
 
 void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
 {
-
+//   cRGB scaledColor;
 	cyg_uint8 string = x/2;
 	cyg_uint8 count = y;
+
+//	float r = color.R >> 1;
+//    float g = color.G >> 1;
+//    float b = color.B >> 1;
+//
+//
+//    scaledColor.R = r;
+//    scaledColor.G = g;
+//    scaledColor.B = b;
+//
+//	if((x == 0) || (x == 1)|| (x == 4) || (x == 5) || (x == 6) ||
+//	      ((x == 3) && (y == 0)) ||
+//	      ((x == 2) && (y == 0)) ||
+//	      ((x == 2) && (y == 1)) ||
+//	      ((x == 2) && (y == 2)) ||
+//	      ((x == 2) && (y == 3)) ||
+//	      ((x == 2) && (y == 4)) ||
+//	      ((x == 2) && (y == 5))
+//	      )
+//	{
+//	   scaledColor.R = r * 1.4;
+//       scaledColor.G = g * 1.7;
+//       scaledColor.B = b * 1.5;
+//	}
+////	else
+////	{
+////	       scaledColor.R =  scaledColor.R >> 1;
+////	       scaledColor.G =  scaledColor.G >> 1;
+////	       scaledColor.B =  scaledColor.B >> 1;
+////	    }
 
 	if(x%2)
 	{
 		count = 31;
 		count -= y;
 	}
-	string += 5;
 //	diag_printf("string %d, count %d\n", string, count);
 
      cyg_uint8 *buffer = &mBuffer[(count * 24)];
+
+
      setStringColor(buffer, string, color);
 
 }
@@ -252,7 +295,7 @@ cWS281xDriver::~cWS281xDriver()
     free(mBuffer);
 }
 
-void cWS281xDriver::paint(cTerm & t,int argc,char **argv)
+void cWS281xDriver::paintDebug(cTerm & t,int argc,char *argv[])
 {
 	if(__instance)
 		__instance->paint();
@@ -261,5 +304,5 @@ void cWS281xDriver::paint(cTerm & t,int argc,char **argv)
 const TermCMD::cmd_list_t wsCommands[] =
 {
       {"WS218x"    ,0,0,0},
-      {"paint",       "",            "Repaint pixels", cWS281xDriver::paint},
+      {"paint",       "",            "Repaint pixels", cWS281xDriver::paintDebug},
 };

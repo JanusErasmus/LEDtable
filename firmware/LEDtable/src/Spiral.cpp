@@ -1,14 +1,12 @@
-/*
- * Spiral.cpp
- *
- *  Created on: 09 Apr 2017
- *      Author: Janus
- */
-
 #include "Spiral.h"
 #include "ws281x_driver.h"
 
 
+static Direction DirectionUp = Direction(0,1);
+static Direction DirectionDown = Direction(0,-1);
+static Direction DirectionLeft = Direction(1,0);
+static Direction DirectionRight = Direction(-1,0);
+static Direction *Directions[] = {&DirectionUp, &DirectionRight, &DirectionDown, &DirectionLeft, 0};
 
 Spiral::Spiral(cyg_uint8 Xstart, cyg_uint8 Ystart, cyg_uint8 XtopMargin, cyg_uint8 YtopMargin, cyg_uint8 XbottomMargin, cyg_uint8 YbottomMargin)
 {
