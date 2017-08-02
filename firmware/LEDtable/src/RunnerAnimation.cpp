@@ -8,8 +8,9 @@ RunnerAnimation::RunnerAnimation()
 void RunnerAnimation::run()
 {
    mRunner.run();
-   cWS281xDriver::get()->paint();
    mRunner.next();
+   cWS281xDriver::get()->paint();
+   cyg_thread_delay(2);
 }
 
 RunnerAnimation::~RunnerAnimation() {

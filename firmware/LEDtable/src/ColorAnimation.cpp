@@ -3,21 +3,26 @@
 
 ColorAnimation::ColorAnimation()
 {
+   mColor = 0;
 }
 
 void ColorAnimation::run()
 {
-   cWS281xDriver::get()->setAll(red);
+   mColor++;
+   if(!pColor[mColor])
+         mColor = 0;
+
+   cWS281xDriver::get()->setAll(*pColor[mColor]);
    cWS281xDriver::get()->paint();
-   cyg_thread_delay(100);
-   cWS281xDriver::get()->setAll(green);
-   cWS281xDriver::get()->paint();
-   cyg_thread_delay(100);
-   cWS281xDriver::get()->setAll(blue);
-   cWS281xDriver::get()->paint();
-   cyg_thread_delay(100);
-   cWS281xDriver::get()->setAll(white);
-   cWS281xDriver::get()->paint();
+//   cyg_thread_delay(100);
+//   cWS281xDriver::get()->setAll(green);
+//   cWS281xDriver::get()->paint();
+//   cyg_thread_delay(100);
+//   cWS281xDriver::get()->setAll(blue);
+//   cWS281xDriver::get()->paint();
+//   cyg_thread_delay(100);
+//   cWS281xDriver::get()->setAll(white);
+//   cWS281xDriver::get()->paint();
    cyg_thread_delay(100);
 }
 

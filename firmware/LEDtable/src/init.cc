@@ -20,6 +20,7 @@
 #include "ColorAnimation.h"
 #include "GoombaAnimation.h"
 #include "SpiralsAnimation.h"
+#include "RunnerAnimation.h"
 
 #define TRACE(_x, ...) INFO_TRACE("cInit", _x,  ##__VA_ARGS__)
 
@@ -72,12 +73,19 @@ void cInit::init_thread(cyg_addrword_t args)
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
 
     Animation *animations[] = {
-       new GoombaAnimation(),
+       new RunnerAnimation(),
        new SpiralsAnimation(),
        new ColorAnimation(),
-       new BigSpiralAnimation()
+       new BigSpiralAnimation(),
+       new GoombaAnimation()
     };
-    int index = 1;
+    int index = 4;
+
+    cyg_tick_count_t lastChange = cyg_current_time();
+
+    cWS281xDriver::get()->setAll(off);
+    cWS281xDriver::get()->paint();
+//    animations[index]->run();
 
     while(1)
     {
@@ -85,6 +93,13 @@ void cInit::init_thread(cyg_addrword_t args)
           animations[index]->run();
        else
           cyg_thread_delay(500);
+
+       if((cyg_current_time() - lastChange) > 3000)
+       {
+          lastChange = cyg_current_time();
+          if(++index > 4)
+             index = 0;
+       }
     }
 }
 

@@ -4,6 +4,7 @@
 
 class ColorAnimation : public Animation
 {
+   int mColor;
 public:
    ColorAnimation();
    virtual ~ColorAnimation();

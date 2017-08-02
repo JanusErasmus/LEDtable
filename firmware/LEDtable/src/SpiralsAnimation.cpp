@@ -29,12 +29,31 @@ void SpiralsAnimation::run()
    string3.run();
    string4.run();
    cWS281xDriver::get()->paint();
+   cyg_thread_delay(1);
 
    string1.next();
    string2.next();
    string3.next();
    string4.next();
+   string1.run();
+   string2.run();
+   string3.run();
+   string4.run();
+   cWS281xDriver::get()->paint();
    cyg_thread_delay(1);
+
+   string1.next();
+   string3.next();
+   string1.run();
+   string3.run();
+   cWS281xDriver::get()->paint();
+   cyg_thread_delay(1);
+
+   string1.next();
+   string1.run();
+   cWS281xDriver::get()->paint();
+   cyg_thread_delay(1);
+
 }
 
 SpiralsAnimation::~SpiralsAnimation()

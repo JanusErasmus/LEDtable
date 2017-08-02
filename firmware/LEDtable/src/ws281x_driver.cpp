@@ -194,15 +194,35 @@ void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
 //    scaledColor.G = g;
 //    scaledColor.B = b;
 //
-//	if((x == 0) || (x == 1)|| (x == 4) || (x == 5) || (x == 6) ||
-//	      ((x == 3) && (y == 0)) ||
-//	      ((x == 2) && (y == 0)) ||
-//	      ((x == 2) && (y == 1)) ||
-//	      ((x == 2) && (y == 2)) ||
-//	      ((x == 2) && (y == 3)) ||
-//	      ((x == 2) && (y == 4)) ||
-//	      ((x == 2) && (y == 5))
-//	      )
+	if((x == 0) || (x == 1)|| (x == 4) || (x == 5) || (x == 6) ||
+	      ((x == 3) && (y == 0)) ||
+	      ((x == 2) && (y == 0)) ||
+	      ((x == 2) && (y == 1)) ||
+	      ((x == 2) && (y == 2)) ||
+	      ((x == 2) && (y == 3)) ||
+	      ((x == 2) && (y == 4)) ||
+	      ((x == 2) && (y == 5))
+	      )
+	{
+	   if(color.R && (color.R < 235))
+	      color.R += 20;
+
+       if(color.G && (color.G < 235))
+          color.G += 20;
+
+       if(color.B && (color.B < 235))
+       {
+          if(color.B > 15)
+             color.B += 20;
+          else
+             color.B += 10;
+       }
+	}
+//	else
+//	{
+//	}
+
+
 //	{
 //	   scaledColor.R = r * 1.4;
 //       scaledColor.G = g * 1.7;
@@ -301,8 +321,133 @@ void cWS281xDriver::paintDebug(cTerm & t,int argc,char *argv[])
 		__instance->paint();
 }
 
+
+void cWS281xDriver::setred(cTerm & t,int argc,char *argv[])
+{
+   if(!__instance)
+      return;
+
+   if(argc > 1)
+   {
+
+      cRGB color(atoi(argv[1]), 0, 0);
+
+      __instance->setAll(color);
+   }
+   else
+   {
+      __instance->setAll(red);
+   }
+
+   __instance->paint();
+}
+
+void cWS281xDriver::setgreen(cTerm & t,int argc,char *argv[])
+{
+   if(!__instance)
+      return;
+
+   if(argc > 1)
+   {
+      cRGB color(0, atoi(argv[1]), 0);
+
+      __instance->setAll(color);
+   }
+   else
+   {
+      __instance->setAll(green);
+   }
+
+   __instance->paint();
+}
+
+void cWS281xDriver::setblue(cTerm & t,int argc,char *argv[])
+{
+   if(!__instance)
+      return;
+
+   if(argc > 1)
+   {
+      cRGB color(0, 0, atoi(argv[1]));
+
+      __instance->setAll(color);
+   }
+   else
+   {
+      __instance->setAll(blue);
+   }
+
+   __instance->paint();
+}
+
+void cWS281xDriver::setBlackred(cTerm & t,int argc,char *argv[])
+{
+   if(!__instance)
+      return;
+
+   if(argc > 1)
+   {
+      cRGB color( atoi(argv[1]), 0, 0);
+
+      __instance->setBlackPixels(color);
+   }
+
+   __instance->paint();
+}
+
+void cWS281xDriver::setBlackgreen(cTerm & t,int argc,char *argv[])
+{
+   if(!__instance)
+      return;
+
+   if(argc > 1)
+   {
+      cRGB color(0, atoi(argv[1]), 0);
+
+      __instance->setBlackPixels(color);
+   }
+
+   __instance->paint();
+}
+
+void cWS281xDriver::setBlackblue(cTerm & t,int argc,char *argv[])
+{
+   if(!__instance)
+      return;
+
+   if(argc > 1)
+   {
+      cRGB color(0, 0, atoi(argv[1]));
+
+      __instance->setBlackPixels(color);
+   }
+
+   __instance->paint();
+}
+
+void cWS281xDriver::setBlackPixels(cRGB color)
+{
+   for(cyg_uint8 r = 0; r < 7; r++)
+   {
+      for(cyg_uint8 k = 0; k < 16; k++)
+      {
+         if((r == 2) || (r == 3))
+            continue;
+
+         setPixel(r, k, color);
+      }
+   }
+}
+
 const TermCMD::cmd_list_t wsCommands[] =
 {
       {"WS218x"    ,0,0,0},
-      {"paint",       "",            "Repaint pixels", cWS281xDriver::paintDebug},
+      {"paint",     "",            "Repaint pixels", cWS281xDriver::paintDebug},
+      {"r",       "set level", "Set all red", cWS281xDriver::setred},
+      {"g",       "set level", "Set all green", cWS281xDriver::setgreen},
+      {"b",       "set level", "Set all blue", cWS281xDriver::setblue},
+      {"br",       "set level", "Set all red", cWS281xDriver::setBlackred},
+      {"bg",       "set level", "Set all red", cWS281xDriver::setBlackgreen},
+      {"bb",       "set level", "Set all red", cWS281xDriver::setBlackblue},
+      0
 };
