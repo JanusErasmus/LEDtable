@@ -19,4 +19,24 @@ cRGB gray(0x40, 0x40, 0x40);
 cRGB orange(179, 89, 0);
 cRGB pink(159, 0, 80);
 
-cRGB *pColor[] = {&blue, &green, &red, &off, &white, &mix3, &gray, &orange, &off, &mix1, &pink, &mix2, 0};
+cRGB lightBlue(128, 201, 201);
+cRGB brown(64, 16, 0);
+cRGB lightBrown(200, 50, 10);
+
+cRGB *pColor[] = {
+      &blue,
+      &green,
+      &red,
+      &off,
+      &brown,
+      &gray,
+      &lightBrown,
+      &white,
+      &orange,
+      &pink,
+      &mix1,
+      &mix2,
+      &mix3,
+      &lightBlue,
+      0
+};

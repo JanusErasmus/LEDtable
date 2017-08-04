@@ -44,16 +44,26 @@ private:
     cWS281xDriver(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count);
     virtual ~cWS281xDriver();
 
+    void setBlackPixels(cRGB color);
+
 public:
 
     static void init(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count);
     static cWS281xDriver *get();
 
+
+    void setAll(cRGB color);
     void resetPixels();
     void setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color);
     void paint();
 
-    static void paint(cTerm & t,int argc,char **argv);
+    static void paintDebug(cTerm & t,int argc,char *argv[]);
+    static void setred(cTerm & t,int argc,char *argv[]);
+    static void setgreen(cTerm & t,int argc,char *argv[]);
+    static void setblue(cTerm & t,int argc,char *argv[]);
+    static void setBlackred(cTerm & t,int argc,char *argv[]);
+    static void setBlackgreen(cTerm & t,int argc,char *argv[]);
+    static void setBlackblue(cTerm & t,int argc,char *argv[]);
 };
 
 extern const TermCMD::cmd_list_t wsCommands[];

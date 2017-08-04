@@ -8,16 +8,16 @@
 #ifndef SRC_RUNNER_H_
 #define SRC_RUNNER_H_
 
-class Runner {
+class Runner
+{
 
-	cyg_uint8 mLedCount;
 	cyg_uint8 mX;
     cyg_int8 mY;
     cyg_int8 mDiff;
     cyg_uint8 cColor;
 
 public:
-	Runner(cyg_uint8 count);
+	Runner();
 	virtual ~Runner();
 
 	void setStart(cyg_uint8 idx){ mY = idx;};

@@ -14,4 +14,13 @@ public:
 
 extern cRGB *pColor[];
 
+extern cRGB red;
+extern cRGB off;
+extern cRGB green;
+extern cRGB blue;
+extern cRGB white;
+extern cRGB lightBlue;
+extern cRGB brown;
+extern cRGB lightBrown;
+
 #endif // CRGB_H
