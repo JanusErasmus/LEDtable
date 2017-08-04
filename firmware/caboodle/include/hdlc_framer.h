@@ -1,18 +1,8 @@
-/*
- * hdlc_framer.h
- *
- *  Created on: 20 Jul 2015
- *      Author: janus
- */
-
 #ifndef SRC_HDLC_FRAMER_H_
 #define SRC_HDLC_FRAMER_H_
 #include <cyg/kernel/kapi.h>
 
-#include <TermCMD.h>
-#include <debug.h>
-
-class cHDLCframer : public cDebug
+class cHDLCframer
 {
 	cyg_uint8 *mBuffer;
 	cyg_uint32 mLength;
@@ -73,12 +63,6 @@ public:
     int pack(cyg_uint8 byte);
 
     cyg_uint8* buffer(){ return mBuffer; };
-
-
-    static void frameDebug(cTerm & term, int argc,char * argv[]);
-
 };
-
-extern const TermCMD::cmd_list_t frameCommands[];
 
 #endif /* SRC_HDLC_FRAMER_H_ */

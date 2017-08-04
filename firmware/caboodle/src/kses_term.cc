@@ -4,9 +4,9 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "kses_term.h"
-#include "TermCMD.h"
-#include "utils.h"
+#include <kses_term.h>
+#include <TermCMD.h>
+#include <utils.h>
 
 cTerm * cTerm::__instance = NULL;
 
@@ -16,6 +16,7 @@ cTerm::cTerm(char * dev,cyg_uint32 b_size,const char * const prompt_str)
 {
     Cyg_ErrNo err;
 
+    mReceiver =0;
 
     cyg_uint32 len = strlen(dev)+1;
     mDev = new char[len];
@@ -76,6 +77,14 @@ void cTerm::init(char * dev,cyg_uint32 b_size,const char * const prompt_str)
     }
 }
 
+void cTerm::setReceiver(cHDLCreceiver *receiver)
+{
+   if(!__instance)
+      return;
+
+   __instance->mReceiver = receiver;
+}
+
 void cTerm::term_thread_func(cyg_addrword_t arg)
 {
     cTerm * t = (cTerm *)arg;
@@ -93,12 +102,24 @@ void cTerm::run(void)
 
     mRxBuff[mRxIdx-1] = 0;
 
-
-
     if ( mRxIdx >= 1 )
     {
+       if(mReceiver && (mRxBuff[0] == '~'))
+       {
+          //diag_printf("HDLC\n");
+          cHDLCframer framer(128);
+          for(cyg_uint32 k = 0 ; k < mRxIdx; k++)
+          {
+             cyg_uint32 len = framer.pack(mRxBuff[k]);
+             if(len)
+             {
+                //diag_printf(" - OK\n");
+                mReceiver->pack(framer.buffer(), len);
+             }
+          }
+       }
+       else
         process_command_line();
-
     }
     prompt();
 }

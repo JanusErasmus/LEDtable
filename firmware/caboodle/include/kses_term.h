@@ -4,9 +4,11 @@
 #include <cyg/hal/hal_arch.h>
 #include <cyg/io/io.h>
 
+#include <hdlc_receiver.h>
+
 class cTerm
 {
-private:
+
     static cTerm * __instance;
     cyg_uint32 mRxIdx;
     cyg_uint32 mBuffSize;
@@ -17,6 +19,7 @@ private:
     cyg_uint8 mStack[CYGNUM_HAL_STACK_SIZE_TYPICAL];
     cyg_thread mThread;
     cyg_handle_t mThreadHandle;
+    cHDLCreceiver *mReceiver;
 
     void process_command_line();
     void dispatch_command_line(int argc,char *argv[]);
@@ -27,6 +30,8 @@ private:
 
 public:
     static void init(char *dev,cyg_uint32 b_size,const char *prompt_str);
+    static void setReceiver(cHDLCreceiver *receiver);
+
     cTerm& operator<<(void *);
     cTerm& operator<<(const char *);
     cTerm& operator<<(int);

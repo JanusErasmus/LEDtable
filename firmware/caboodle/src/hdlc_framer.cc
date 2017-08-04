@@ -2,9 +2,9 @@
 #include <cyg/kernel/diag.h>
 #include <string.h>
 
-#include "debug.h"
-#include "hdlc_framer.h"
-#include "crc.h"
+#include <utils.h>
+#include <hdlc_framer.h>
+#include <crc.h>
 
 const cyg_uint8 escapedChars[] =
 {
@@ -12,7 +12,7 @@ const cyg_uint8 escapedChars[] =
 };
 
 
-cHDLCframer::cHDLCframer(cyg_uint32 buff_len) : cDebug("hdlc")
+cHDLCframer::cHDLCframer(cyg_uint32 buff_len)
 {
 	mBuffer = (cyg_uint8*)malloc(buff_len);
 	mLength = buff_len;
@@ -205,38 +205,3 @@ cHDLCframer::~cHDLCframer()
 {
 	free(mBuffer);
 }
-
-void cHDLCframer::frameDebug(cTerm & term, int argc,char * argv[])
-{
-    cyg_uint8 *data = (cyg_uint8*)malloc(1024);
-    cyg_uint8 *frameBuffer = (cyg_uint8*)malloc(1024);
-
-    cyg_uint8 tag[] = {0x08, 0x08, 0x08, 0x08, 0x08};
-
-    memset(data, 2,80);
-    memcpy(&data[80], tag, 5);
-    memset(&data[85], 20,80);
-    memcpy(&data[95], tag, 5);
-
-    memcpy(&data[100], data, 100);
-
-    memcpy(&data[200], data, 100);
-
-    cyg_uint32 length = 0;
-    frame(data, 300, frameBuffer, &length);
-
-    diag_printf("Data\n");
-    diag_dump_buf(data, 300);
-    diag_printf("Frame\n");
-    diag_dump_buf(frameBuffer, length);
-
-    free(frameBuffer);
-    free(data);
-
-}
-
-const TermCMD::cmd_list_t frameCommands[] =
-{
-        {"hdlc"    , "",    "test framing", cHDLCframer::frameDebug},
-        {0, 0, 0, 0}
-};
