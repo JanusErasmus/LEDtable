@@ -218,10 +218,25 @@ void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
    //	diag_printf("string %d, count %d\n", string, count);
 
    cyg_uint8 *buffer = &mBuffer[(count * 24)];
-
-
    setStringColor(buffer, string, color);
+}
 
+
+void cWS281xDriver::setBuffer(cyg_uint8 *buffer, cyg_uint32 len)
+{
+   if(len > mBitCount)
+      len = mBitCount;
+
+   memcpy(mBuffer, buffer, len);
+}
+
+cyg_uint32 cWS281xDriver::getBuffer(cyg_uint8 *buffer, cyg_uint32 len)
+{
+   if(len > mBitCount)
+      len = mBitCount;
+
+   memcpy(buffer, mBuffer, len);
+   return len;
 }
 
 void cWS281xDriver::paint()

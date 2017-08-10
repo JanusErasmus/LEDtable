@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <kses_term.h>
 #include <TermCMD.h>
@@ -106,17 +107,21 @@ void cTerm::run(void)
     {
        if(mReceiver && (mRxBuff[0] == '~'))
        {
-          //diag_printf("HDLC\n");
-          cHDLCframer framer(128);
-          for(cyg_uint32 k = 0 ; k < mRxIdx; k++)
+          cyg_uint8 frame[64];
+          char string[4];
+          cyg_uint32 index = 0;
+          for(cyg_uint8 k = 1; k < (mRxIdx - 1); k++)
           {
-             int len = framer.pack(mRxBuff[k]);
-             if(len > 0)
-             {
-                //diag_printf(" - OK\n");
-                mReceiver->pack(framer.buffer(), len);
-             }
+             string[0] = mRxBuff[k++];
+             string[1] = mRxBuff[k];
+             string[2] = 0;
+             frame[index++] = strtoul(string, 0, 16);
           }
+//          diag_printf("HDLC %d\n", index);
+//          diag_dump_buf(frame, index);
+
+          if(index)
+             mReceiver->pack(frame, index);
        }
        else
         process_command_line();

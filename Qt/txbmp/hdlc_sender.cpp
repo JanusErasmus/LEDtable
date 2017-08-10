@@ -45,76 +45,50 @@ void HDLCsender::send(unsigned char *data, qint64 len)
     if(!mSerial)
         return;
 
-    unsigned char txData[2048];
-    int txLen = 0;
-    for(int k = 0; k < len; k++)
-    {
-        if(data[k] == '\n') //insert escape
-        {
-            txData[txLen++] = 0x7D;
-            txData[txLen++] = '\n' ^ 0x20;
-        }
-        else if(data[k] == '\r') //insert escape
-        {
-            txData[txLen++] = 0x7D;
-            txData[txLen++] = '\r' ^ 0x20;
-        }
-        else if(data[k] == 8) //insert escape
-        {
-            txData[txLen++] = 0x7D;
-            txData[txLen++] = 8 ^ 0x20;
-        }
-        else if(data[k] == 0) //insert escape
-        {
-            txData[txLen++] = 0x7D;
-            txData[txLen++] = 0x20;
-        }
-        else if(data[k] == 127) //insert escape
-        {
-            txData[txLen++] = 0x7D;
-            txData[txLen++] = 127 ^ 0x20;
-        }
-        else if(data[k] == '\b') //insert escape
-        {
-            txData[txLen++] = 0x7D;
-            txData[txLen++] ='\b' ^ 0x20;
-        }
-        else
-        {
-            txData[txLen++] = data[k];
-        }
-    }
-    qInfo("Sending %d", txLen);
-    unsigned char txFrameData[4098];
-    int txFrameLen = 4098;
-    HDLC::HDLC_Frame(txData, txLen, txFrameData, &txFrameLen);    
-    qInfo("frame  %d", txFrameLen);
+    unsigned char frame[2048];
+    int frameLen = 2048;
+    HDLC::HDLC_Frame(data, len, frame, &frameLen);
 
-    int transmitIndex = 0;
-    int transmit = txFrameLen;
-    while(transmit)
+    qInfo() << "Send " << frameLen << " bytes";
+    int sentLen = 0;
+    int index = 0;
+    while(sentLen < frameLen)
     {
-        int sent = transmit;
-        if(sent > 60)
-            sent = 60;
+        char string[128];
+        memset(string, 0, 128);
+        string[0] = '~';
 
-        unsigned char frame[120];
-        int frameLen = 120;
-        HDLC::HDLC_Frame(&txFrameData[transmitIndex], sent, frame, &frameLen);
-        frame[frameLen++] = '\r';
+        int txLen = (frameLen - sentLen);
+        if(txLen > 60)
+            txLen = 60;
+
+        for(int k = 0; k < txLen; k++)
+        {
+            char numberString[8];
+            sprintf(numberString, "%02X", frame[k + index]);
+            strcat(string, numberString);
+        }
+        index += txLen;
+
+//        char numberString[8];
+//        sprintf(numberString, "%02X", 0x55);
+//        strcat(string, numberString);
+
+        strcat(string, "\r");
+        int stringLen = (int)strlen(string);
 
         if(mSerial->isOpen())
         {
-            mSerial->write((const char*)frame, frameLen);
+            mSerial->write((const char*)string, stringLen);
             if(!mSerial->waitForBytesWritten(2000))
             {
                 qCritical("Send failure");
                 return;
             }
             else
-                qInfo() << "TX OK" << frameLen;
+                qInfo() << "TX OK" << stringLen;
 
-            QThread::msleep(200);
+            QThread::msleep(20);
         }
         else
         {
@@ -122,8 +96,7 @@ void HDLCsender::send(unsigned char *data, qint64 len)
             return;
         }
 
-        transmit -= sent;
-        transmitIndex += sent;
+        sentLen += txLen;
     }
 }
 
@@ -149,27 +122,27 @@ void HDLCsender::readData()
             //        qInfo() << data;
             if(mBuffer.endsWith('\r'))// || mBuffer.endsWith('\n'))
             {
-                for(int k = 0; k < mBuffer.length(); k)
-                {
-                    char line[128];
-                    line[0] = 0;
+//                for(int k = 0; k < mBuffer.length(); k)
+//                {
+//                    char line[128];
+//                    line[0] = 0;
 
-                    int len = mBuffer.length() - k;
-                    if(len > 16)
-                        len = 16;
-                    for(int i = 0; i < len; i++)
-                    {
-                        char tempNumber[16];
-                        sprintf(tempNumber, "0x%02X ", mBuffer.at(k + i));
-                        strcat(line, tempNumber);
-                    }
-                    k += len;
+//                    int len = mBuffer.length() - k;
+//                    if(len > 16)
+//                        len = 16;
+//                    for(int i = 0; i < len; i++)
+//                    {
+//                        char tempNumber[16];
+//                        sprintf(tempNumber, "0x%02X ", mBuffer.at(k + i));
+//                        strcat(line, tempNumber);
+//                    }
+//                    k += len;
 
-                    qInfo() << line;
-                }
-//                QString code = QString(mBuffer).trimmed();
-//                code.remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?")));
-//                qDebug() << "RX: " << code;
+//                    qInfo() << line;
+//                }
+                QString code = QString(mBuffer).trimmed();
+                code.remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?")));
+                qDebug() << "RX: " << code;
 
                 mBuffer.clear();
             }

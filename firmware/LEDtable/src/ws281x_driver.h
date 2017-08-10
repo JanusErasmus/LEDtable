@@ -57,6 +57,9 @@ public:
     void setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color);
     void paint();
 
+    void setBuffer(cyg_uint8 *buffer, cyg_uint32 len);
+    cyg_uint32 getBuffer(cyg_uint8 *buffer, cyg_uint32 len);
+
     static void paintDebug(cTerm & t,int argc,char *argv[]);
     static void setred(cTerm & t,int argc,char *argv[]);
     static void setgreen(cTerm & t,int argc,char *argv[]);
