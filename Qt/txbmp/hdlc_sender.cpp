@@ -40,12 +40,12 @@ QSerialPort *HDLCsender::openPort(QString portName)
     return serial;
 }
 
-void HDLCsender::send(char *data, qint64 len)
+void HDLCsender::send(unsigned char *data, qint64 len)
 {
     if(!mSerial)
         return;
 
-    unsigned char txData[1024];
+    unsigned char txData[2048];
     int txLen = 0;
     for(int k = 0; k < len; k++)
     {
@@ -74,15 +74,21 @@ void HDLCsender::send(char *data, qint64 len)
             txData[txLen++] = 0x7D;
             txData[txLen++] = 127 ^ 0x20;
         }
+        else if(data[k] == '\b') //insert escape
+        {
+            txData[txLen++] = 0x7D;
+            txData[txLen++] ='\b' ^ 0x20;
+        }
         else
         {
             txData[txLen++] = data[k];
         }
     }
     qInfo("Sending %d", txLen);
-    unsigned char txFrameData[1024];
-    int txFrameLen = 1024;
-    HDLC::HDLC_Frame(txData, txLen, txFrameData, &txFrameLen);
+    unsigned char txFrameData[4098];
+    int txFrameLen = 4098;
+    HDLC::HDLC_Frame(txData, txLen, txFrameData, &txFrameLen);    
+    qInfo("frame  %d", txFrameLen);
 
     int transmitIndex = 0;
     int transmit = txFrameLen;
@@ -143,9 +149,27 @@ void HDLCsender::readData()
             //        qInfo() << data;
             if(mBuffer.endsWith('\r'))// || mBuffer.endsWith('\n'))
             {
-                QString code = QString(mBuffer).trimmed();
-                code.remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?")));
-                qDebug() << "RX: " << code;
+                for(int k = 0; k < mBuffer.length(); k)
+                {
+                    char line[128];
+                    line[0] = 0;
+
+                    int len = mBuffer.length() - k;
+                    if(len > 16)
+                        len = 16;
+                    for(int i = 0; i < len; i++)
+                    {
+                        char tempNumber[16];
+                        sprintf(tempNumber, "0x%02X ", mBuffer.at(k + i));
+                        strcat(line, tempNumber);
+                    }
+                    k += len;
+
+                    qInfo() << line;
+                }
+//                QString code = QString(mBuffer).trimmed();
+//                code.remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?")));
+//                qDebug() << "RX: " << code;
 
                 mBuffer.clear();
             }

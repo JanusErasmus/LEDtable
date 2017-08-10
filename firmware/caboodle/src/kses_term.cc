@@ -110,8 +110,8 @@ void cTerm::run(void)
           cHDLCframer framer(128);
           for(cyg_uint32 k = 0 ; k < mRxIdx; k++)
           {
-             cyg_uint32 len = framer.pack(mRxBuff[k]);
-             if(len)
+             int len = framer.pack(mRxBuff[k]);
+             if(len > 0)
              {
                 //diag_printf(" - OK\n");
                 mReceiver->pack(framer.buffer(), len);

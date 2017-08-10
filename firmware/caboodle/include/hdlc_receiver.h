@@ -11,6 +11,7 @@ public:
    virtual ~cHDLCreceiver();
 
    void pack(cyg_uint8 *buff, cyg_uint32 len);
+   virtual void handleData(cyg_uint8 *buff, cyg_uint32 len);
 };
 
 #endif /* INCLUDE_HDLC_RECEIVER_H_ */

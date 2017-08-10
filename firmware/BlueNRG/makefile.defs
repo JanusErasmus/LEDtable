@@ -1,0 +1,4 @@
+-include ../../ecos/ecos_install/include/pkgconf/ecos.mak
+
+CFLAGS = $(filter-out -Woverloaded-virtual -fno-rtti,$(ECOS_GLOBAL_CFLAGS))
+CCFLAGS = $(filter-out -Wstrict-prototypes,$(ECOS_GLOBAL_CFLAGS))

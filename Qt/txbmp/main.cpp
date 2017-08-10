@@ -3,6 +3,7 @@
 #include <QThread>
 
 #include "hdlc_sender.h"
+#include "bmp_reader.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,20 +15,11 @@ int main(int argc, char *argv[])
     {
         qInfo("Convert and send %s via %s", argv[1], argv[2]);
 
+        unsigned char pixels[1024];
+        BMPreader reader(argv[1]);
+        int len = reader.getBuffer(pixels, 1024);
         HDLCsender *sender = new HDLCsender(argv[2]);
-
-
-        char buff[1024];
-        memset(buff, 0x55, 1024);
-        memset(buff, '\n', 10);
-        for(int k = 2; k < 255; k++)
-            buff[k] = k;
-
-        buff[0] = 'J';
-        buff[1] = 'A';
-        buff[798] = 'J';
-        buff[799] = 'A';
-        sender->send(buff, 800);
+        sender->send(pixels, len);
         sender->wait();
     }
     else

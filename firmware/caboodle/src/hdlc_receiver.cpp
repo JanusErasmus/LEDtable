@@ -12,13 +12,13 @@ void cHDLCreceiver::pack(cyg_uint8 *buff, cyg_uint32 len)
 {
    for(cyg_uint32 k = 0; k < len; k++)
    {
-      cyg_uint32 rxLen = mFramer.pack(buff[k]);
-      if(rxLen)
+      int rxLen = mFramer.pack(buff[k]);
+      if(rxLen > 0)
       {
          cyg_uint8 *p = mFramer.buffer();
          cyg_uint32 frameLen = 0;
          cyg_uint8 data[1024];
-         for(cyg_uint32 k = 0; k < rxLen; k++)
+         for(int k = 0; k < rxLen; k++)
          {
             if(p[k] == 0x7D)
             {
@@ -27,10 +27,15 @@ void cHDLCreceiver::pack(cyg_uint8 *buff, cyg_uint32 len)
             else
                data[frameLen++] = p[k];
          }
-         TRACE("RX %d\n", frameLen);
-         diag_dump_buf(data, frameLen);
+         handleData(data, frameLen);
       }
    }
+}
+
+void cHDLCreceiver::handleData(cyg_uint8 *buff, cyg_uint32 len)
+{
+   TRACE("RX %d\n", len);
+   diag_dump_buf(buff, len);
 }
 
 cHDLCreceiver::~cHDLCreceiver()

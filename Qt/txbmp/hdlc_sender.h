@@ -15,7 +15,7 @@ public:
     HDLCsender(QString portName);
     ~HDLCsender();
 
-    void send(char *data, qint64 len);
+    void send(unsigned char *data, qint64 len);
     void wait();
 
 private slots:

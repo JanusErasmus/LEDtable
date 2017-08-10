@@ -181,71 +181,46 @@ void setStringColor(cyg_uint8 *buffer, cyg_uint8 string, cRGB color)
 
 void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
 {
-//   cRGB scaledColor;
-	cyg_uint8 string = x/2;
-	cyg_uint8 count = y;
+   x = 15 - x;
+   cyg_uint8 string = x/2;
+   cyg_uint8 count = y;
 
-//	float r = color.R >> 1;
-//    float g = color.G >> 1;
-//    float b = color.B >> 1;
+//   if((x == 15) || (x == 14)|| (x == 11) || (x == 10) || (x == 9) ||
+//         ((x == 12) && (y == 0)) ||
+//         ((x == 13) && (y == 0)) ||
+//         ((x == 13) && (y == 1)) ||
+//         ((x == 13) && (y == 2)) ||
+//         ((x == 13) && (y == 3)) ||
+//         ((x == 13) && (y == 4)) ||
+//         ((x == 13) && (y == 5))
+//   )
+//   {
+//      if(color.R && (color.R < 235))
+//         color.R += 20;
 //
+//      if(color.G && (color.G < 235))
+//         color.G += 20;
 //
-//    scaledColor.R = r;
-//    scaledColor.G = g;
-//    scaledColor.B = b;
-//
-	if((x == 0) || (x == 1)|| (x == 4) || (x == 5) || (x == 6) ||
-	      ((x == 3) && (y == 0)) ||
-	      ((x == 2) && (y == 0)) ||
-	      ((x == 2) && (y == 1)) ||
-	      ((x == 2) && (y == 2)) ||
-	      ((x == 2) && (y == 3)) ||
-	      ((x == 2) && (y == 4)) ||
-	      ((x == 2) && (y == 5))
-	      )
-	{
-	   if(color.R && (color.R < 235))
-	      color.R += 20;
+//      if(color.B && (color.B < 235))
+//      {
+//         if(color.B > 15)
+//            color.B += 20;
+//         else
+//            color.B += 10;
+//      }
+//   }
 
-       if(color.G && (color.G < 235))
-          color.G += 20;
+   if(x%2)
+   {
+      count = 31;
+      count -= y;
+   }
+   //	diag_printf("string %d, count %d\n", string, count);
 
-       if(color.B && (color.B < 235))
-       {
-          if(color.B > 15)
-             color.B += 20;
-          else
-             color.B += 10;
-       }
-	}
-//	else
-//	{
-//	}
+   cyg_uint8 *buffer = &mBuffer[(count * 24)];
 
 
-//	{
-//	   scaledColor.R = r * 1.4;
-//       scaledColor.G = g * 1.7;
-//       scaledColor.B = b * 1.5;
-//	}
-////	else
-////	{
-////	       scaledColor.R =  scaledColor.R >> 1;
-////	       scaledColor.G =  scaledColor.G >> 1;
-////	       scaledColor.B =  scaledColor.B >> 1;
-////	    }
-
-	if(x%2)
-	{
-		count = 31;
-		count -= y;
-	}
-//	diag_printf("string %d, count %d\n", string, count);
-
-     cyg_uint8 *buffer = &mBuffer[(count * 24)];
-
-
-     setStringColor(buffer, string, color);
+   setStringColor(buffer, string, color);
 
 }
 
@@ -449,5 +424,5 @@ const TermCMD::cmd_list_t wsCommands[] =
       {"br",       "set level", "Set all red", cWS281xDriver::setBlackred},
       {"bg",       "set level", "Set all red", cWS281xDriver::setBlackgreen},
       {"bb",       "set level", "Set all red", cWS281xDriver::setBlackblue},
-      0
+      {0, 0, 0},
 };
