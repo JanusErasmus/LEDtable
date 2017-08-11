@@ -28,7 +28,7 @@ cLEDdriver::cLEDdriver(cLED ** leds, cyg_uint8 ledCount)
 
     setupLEDs(mLEDs, mLEDCnt);
 
-    cyg_thread_create(15,
+    cyg_thread_create(17,
             cLEDdriver::led_thread,
             (cyg_addrword_t)this,
             (char *)"heartBeat",

@@ -12,7 +12,7 @@
 
 #include "spi_dev.h"
 
-CYG_DEVS_SPI_CORTEXM_STM32_DEVICE(BLE_spi_dev       , 1, 0, false, 0,0,10000000,1,1,1)
+CYG_DEVS_SPI_CORTEXM_STM32_DEVICE(BLE_spi_dev       , 1, 0, false, 0,0,5000000,2,2,2)
 
 CYG_DEVS_SPI_CORTEXM_STM32_DEVICE(stm32_flash_dev   , 3, 0, false, 0,0,6000000,1,4,1)
 

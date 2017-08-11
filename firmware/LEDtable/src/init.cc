@@ -32,7 +32,7 @@ cInit::cInit() : cDebug("init")
 {
     __instance = this;
 
-    cyg_thread_create(15,
+    cyg_thread_create(17,
             init_thread,
             (cyg_addrword_t)this,
             (char *)"cInit",
@@ -49,21 +49,21 @@ cInit::cInit() : cDebug("init")
 
 void initBLE()
 {
-   cyg_uint8 mac[] = {0x00, 0x50, 0xC2, 0x84, 0xB2, 0x1C};
-   char BLEname[64];
-      BLEname[0] = 0;
-      sprintf(BLEname, "LED %d", mac[5]);
-      cBlueNRG *blue = cBlueNRG::init(
-            mac,
-            BLEname,
-            &BLE_spi_dev,
-            CYGHWR_HAL_STM32_PIN_IN(A,  0, PULLDOWN),
-            CYGHWR_HAL_STM32_PIN_OUT(A, 8, PUSHPULL, NONE, HIGH));
+   cyg_uint8 mac[] = {0x1C, 0xB2, 0x84, 0xC2, 0x50, 0x00};
+   char *BLEname = (char*)malloc(64);
+   BLEname[0] = 0;
+   sprintf(BLEname, "LED %d", mac[0]);
+   cBlueNRG *blue = cBlueNRG::init(
+         mac,
+         BLEname,
+         &BLE_spi_dev,
+         CYGHWR_HAL_STM32_PIN_IN(A,  0, PULLDOWN),
+         CYGHWR_HAL_STM32_PIN_OUT(A, 8, PUSHPULL, NONE, HIGH));
 
-      while(!blue->ready())
-         cyg_thread_delay(100);
+   while(!blue->ready())
+      cyg_thread_delay(100);
 
-      cBlueDevice::init(blue);
+   cBlueDevice::init(blue);
 
 }
 
@@ -95,20 +95,20 @@ void cInit::init_thread(cyg_addrword_t args)
     WS281receiver *receiver = new WS281receiver();
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
     cTerm::setReceiver(receiver);
-
-    Animation *animations[] = {
-       new RunnerAnimation(),
-       new SpiralsAnimation(),
-       new ColorAnimation(),
-       new BigSpiralAnimation(),
-       new GoombaAnimation()
-    };
-    int index = 4;
-
-    cyg_tick_count_t lastChange = cyg_current_time();
-
-    cWS281xDriver::get()->setAll(off);
-    cWS281xDriver::get()->paint();
+//
+//    Animation *animations[] = {
+//       new RunnerAnimation(),
+//       new SpiralsAnimation(),
+//       new ColorAnimation(),
+//       new BigSpiralAnimation(),
+//       new GoombaAnimation()
+//    };
+//    int index = 4;
+//
+//    cyg_tick_count_t lastChange = cyg_current_time();
+//
+//    cWS281xDriver::get()->setAll(off);
+//    cWS281xDriver::get()->paint();
 //    animations[index]->run();
 
     while(1)
@@ -116,7 +116,7 @@ void cInit::init_thread(cyg_addrword_t args)
 //       if(animations[index])
 //          animations[index]->run();
 //       else
-          cyg_thread_delay(500);
+          cyg_thread_delay(100);
 //
 //       if((cyg_current_time() - lastChange) > 3000)
 //       {

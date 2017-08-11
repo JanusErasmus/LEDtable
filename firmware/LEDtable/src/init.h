@@ -4,7 +4,7 @@
 #include <cyg/hal/hal_arch.h>
 
 #include "kses_term.h"
-#include "debug.h"
+#include <debug.h>
 
 
 class cInit : public cDebug

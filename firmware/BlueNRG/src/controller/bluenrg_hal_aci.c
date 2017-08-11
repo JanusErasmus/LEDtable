@@ -233,7 +233,7 @@ tBleStatus aci_hal_get_link_status(uint8_t link_status[8], uint16_t conn_handle[
   if(rp.status)
     return rp.status;
   
-  memcpy(link_status,rp.link_status,sizeof(link_status));
+  memcpy(link_status,rp.link_status,sizeof(rp.link_status));
   for(i = 0; i < 8; i++)
     conn_handle[i] = btohs(rp.conn_handle[i]);
   

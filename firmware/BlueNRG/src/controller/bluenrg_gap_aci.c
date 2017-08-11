@@ -1172,7 +1172,7 @@ tBleStatus aci_gap_resolve_private_address_IDB05A1(const tBDAddr private_address
   if(rp.status)
     return rp.status;
   
-  memcpy(actual_address, rp.address, sizeof(actual_address));
+  memcpy(actual_address, rp.address, sizeof(rp.address));
 
   return 0;
 }

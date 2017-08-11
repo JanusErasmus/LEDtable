@@ -1,5 +1,6 @@
 #ifndef INCLUDE_STM32_EXT_INTERRUPT_H_
 #define INCLUDE_STM32_EXT_INTERRUPT_H_
+#include <cyg/kernel/kapi.h>
 
 #ifdef __cplusplus
 extern "C"  {

@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "ble_status.h"
 #include "hal.h"
@@ -98,6 +99,7 @@ int HCI_verify(const tHciDataPacket * hciReadPacket)
 
 __attribute__((weak)) void HCI_Event_CB(void *pckt)
 {
+	printf("BLE pckt RX\n");
 }
 
 void HCI_Process(void)
@@ -157,6 +159,7 @@ void HCI_Isr(void)
 		else{
 			// HCI Read Packet Pool is empty, wait for a free packet.
 			Clear_SPI_EXTI_Flag();
+		    cyg_mutex_unlock(&mISRmutex);
 			return;
 		}
 

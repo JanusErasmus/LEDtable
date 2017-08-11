@@ -30,9 +30,12 @@
 								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.1093491201" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.187422580" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.683259202" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/kmsg}&quot;"/>
 									<listOptionValue builtIn="false" value="../../ecos/ecos_install/include"/>
 									<listOptionValue builtIn="false" value=".././include"/>
 									<listOptionValue builtIn="false" value="../../caboodle/include"/>
+									<listOptionValue builtIn="false" value="../../kmsg/include"/>
+									<listOptionValue builtIn="false" value="../../cirfat/include"/>
 								</option>
 								<option id="gnu.c.compiler.option.misc.other.1574969995" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="$(CFLAGS) -c -fmessage-length=0" valueType="string"/>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.369168090" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false"/>
@@ -42,9 +45,12 @@
 								<option id="gnu.cpp.compiler.option.optimization.level.590387884" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.1993948155" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.154791358" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/kmsg}&quot;"/>
 									<listOptionValue builtIn="false" value="../../ecos/ecos_install/include"/>
 									<listOptionValue builtIn="false" value=".././include"/>
 									<listOptionValue builtIn="false" value="../../caboodle/include"/>
+									<listOptionValue builtIn="false" value="../../kmsg/include"/>
+									<listOptionValue builtIn="false" value="../../cirfat/include"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.849393298" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="$(CCFLAGS) -c -fmessage-length=0" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1873929509" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false"/>
@@ -59,6 +65,8 @@
 								<option id="gnu.both.asm.option.include.paths.106497822" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/kmsg}&quot;"/>
 									<listOptionValue builtIn="false" value="../../caboodle/include"/>
+									<listOptionValue builtIn="false" value="../../kmsg/include"/>
+									<listOptionValue builtIn="false" value="../../cirfat/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.889661759" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>

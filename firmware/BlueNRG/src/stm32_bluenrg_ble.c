@@ -36,7 +36,6 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
 
 #include <stm32_ext_interrupt.h>
 
@@ -51,7 +50,7 @@ cyg_interrupt mInterrupt;
 cyg_handle_t mIntHandle;
 static cyg_uint32 handleISR(cyg_vector_t vector,cyg_addrword_t data);
 static void handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_t data);
-void (*mInterruptCB)(void) = 0;
+void (*mInterruptCB)(void);
 
 extern volatile uint32_t ms_counter;
 
