@@ -7,10 +7,11 @@ MEMORY
 {
     ram   : ORIGIN = 0x20000000, LENGTH = 0x00020000-CYGNUM_HAL_COMMON_INTERRUPTS_STACK_SIZE
     flash : ORIGIN = 0x08000000, LENGTH = 0x00100000
+    ccm   : ORIGIN = 0x10000000, LENGTH = 0x00010000
 }
 
 hal_vsr_table = 0x20000000;
-hal_virtual_vector_table = hal_vsr_table + 85*4;
+hal_virtual_vector_table = hal_vsr_table + 98*4;
 #if defined(CYGSEM_HAL_VIRTUAL_VECTOR_SUPPORT)
 hal_virtual_vector_table_end = hal_virtual_vector_table + 64*4;
 #else // zero size virtual vector table
@@ -33,7 +34,8 @@ SECTIONS
     SECTION_gcc_except_table (flash, ALIGN (0x8), LMA_EQ_VMA)
     SECTION_eh_frame (flash, ALIGN (0x8), LMA_EQ_VMA)
     SECTION_got (flash, ALIGN (0x8), LMA_EQ_VMA)
-    SECTION_sram (ram, hal_virtual_vector_table_end, FOLLOWING (.got))
+    USER_SECTION (ccm, ccm, 0x10000000, FOLLOWING (.got))
+    SECTION_sram (ram, hal_virtual_vector_table_end, FOLLOWING (.ccm))
     SECTION_data (ram, ALIGN( 0x8), FOLLOWING (.sram))
     SECTION_bss (ram, ALIGN (0x8), LMA_EQ_VMA)
     CYG_LABEL_DEFN(__heap1) = ALIGN (0x8);
