@@ -69,7 +69,7 @@ void initBLE()
 
 void cInit::init_thread(cyg_addrword_t args)
 {
-    cLED *statusLED  = new cLED(CYGHWR_HAL_STM32_PIN_OUT(A,  5, PUSHPULL, NONE, 2MHZ), 0);
+    cLED *statusLED  = new cLED(CYGHWR_HAL_STM32_PIN_OUT(E,  9, PUSHPULL, NONE, 2MHZ), CYGHWR_HAL_STM32_PIN_OUT(E,  10, PUSHPULL, NONE, 2MHZ));
 
     cLED *ledList[] = {
             statusLED,
@@ -78,16 +78,16 @@ void cInit::init_thread(cyg_addrword_t args)
 
     cyg_uint32 outputPortNumbers[] =
     {
-          CYGHWR_HAL_STM32_PIN_OUT(C,  0, OPENDRAIN, NONE, 50MHZ),
-          CYGHWR_HAL_STM32_PIN_OUT(C,  1, OPENDRAIN, NONE, 50MHZ),
-          CYGHWR_HAL_STM32_PIN_OUT(C,  2, OPENDRAIN, NONE, 50MHZ),
+          CYGHWR_HAL_STM32_PIN_OUT(E,  0, OPENDRAIN, NONE, 50MHZ),
+          CYGHWR_HAL_STM32_PIN_OUT(E,  1, OPENDRAIN, NONE, 50MHZ),
+          CYGHWR_HAL_STM32_PIN_OUT(E,  2, OPENDRAIN, NONE, 50MHZ),
           CYGHWR_HAL_STM32_PIN_OUT(C,  3, OPENDRAIN, NONE, 50MHZ),
           CYGHWR_HAL_STM32_PIN_OUT(C,  4, OPENDRAIN, NONE, 50MHZ),
           CYGHWR_HAL_STM32_PIN_OUT(C,  5, OPENDRAIN, NONE, 50MHZ),
           CYGHWR_HAL_STM32_PIN_OUT(C,  6, OPENDRAIN, NONE, 50MHZ),
           CYGHWR_HAL_STM32_PIN_OUT(C,  7, OPENDRAIN, NONE, 50MHZ),
     };
-    cWS281xDriver::init(cWS281xDriver::WS2812, 32, outputPortNumbers, 8);
+    cWS281xDriver::init(cWS281xDriver::WS2812, 2, outputPortNumbers, 3);
 
     initFlash();
     initBLE();
@@ -96,6 +96,10 @@ void cInit::init_thread(cyg_addrword_t args)
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
     cTerm::setReceiver(receiver);
 //
+
+//    initFlash();
+
+    cTerm::init((char *)"/dev/tty0",128,"iLED>>");
 //    Animation *animations[] = {
 //       new RunnerAnimation(),
 //       new SpiralsAnimation(),
@@ -108,7 +112,6 @@ void cInit::init_thread(cyg_addrword_t args)
 //    cyg_tick_count_t lastChange = cyg_current_time();
 //
 //    cWS281xDriver::get()->setAll(off);
-//    cWS281xDriver::get()->paint();
 //    animations[index]->run();
 
     while(1)
@@ -117,6 +120,8 @@ void cInit::init_thread(cyg_addrword_t args)
 //          animations[index]->run();
 //       else
           cyg_thread_delay(100);
+//          diag_printf("r");
+          cWS281xDriver::get()->paint();
 //
 //       if((cyg_current_time() - lastChange) > 3000)
 //       {

@@ -2,15 +2,25 @@ STARTUP(vectors.o)
 ENTRY(reset_vector)
 INPUT(extras.o)
 GROUP(libtarget.a libgcc.a libsupc++.a)
+
 MEMORY
 {
     ram : ORIGIN = 0x20000000, LENGTH = 0x00020000-4096
     flash : ORIGIN = 0x08000000, LENGTH = 0x00100000
+    ccm : ORIGIN = 0x10000000, LENGTH = 0x00010000
 }
+
 hal_vsr_table = 0x20000000;
-hal_virtual_vector_table = hal_vsr_table + 85*4;
+hal_virtual_vector_table = hal_vsr_table + 98*4;
+
 hal_virtual_vector_table_end = hal_virtual_vector_table + 64*4;
+
+
+
+
+
 hal_startup_stack = 0x20000000 + 1024*128;
+
 SECTIONS
 {
     .debug_aranges 0 : { *(.debug_aranges) } .debug_pubnames 0 : { *(.debug_pubnames) } .debug_info 0 : { *(.debug_info) } .debug_abbrev 0 : { *(.debug_abbrev) } .debug_line 0 : { *(.debug_line) } .debug_frame 0 : { *(.debug_frame) } .debug_str 0 : { *(.debug_str) } .debug_loc 0 : { *(.debug_loc) } .debug_macinfo 0 : { *(.debug_macinfo) } .note.arm.ident 0 : { KEEP (*(.note.arm.ident)) } /DISCARD/ 0 : { *(.fini_array*) }
@@ -24,7 +34,8 @@ SECTIONS
     .gcc_except_table ALIGN (0x8) : { . = .; KEEP(*(.gcc_except_table)) *(.gcc_except_table.*) } > flash
     .eh_frame ALIGN (0x8) : { . = .; __EH_FRAME_BEGIN__ = .; KEEP(*(.eh_frame)) __FRAME_END__ = .; . = . + 8; } > flash = 0
     .got ALIGN (0x8) : { . = .; *(.got.plt) *(.got) _GOT1_START_ = ABSOLUTE (.); *(.got1) _GOT1_END_ = ABSOLUTE (.); _GOT2_START_ = ABSOLUTE (.); *(.got2) _GOT2_END_ = ABSOLUTE (.); } > flash
-    .sram hal_virtual_vector_table_end : AT ((LOADADDR (.got) + SIZEOF (.got) + (4) - 1) & ~ ((4) - 1)) { __sram_data_start = ABSOLUTE (.); *(.sram*) . = ALIGN (4); } > ram __srom_data_start = LOADADDR (.sram); __sram_data_end = .; PROVIDE (__sram_data_end = .); PROVIDE (__srom_data_end = LOADADDR (.sram) + SIZEOF(.sram));
+    .ccm 0x10000000 : AT ((LOADADDR (.got) + SIZEOF (.got) + (4) - 1) & ~ ((4) - 1)) { __ccm_start = ABSOLUTE (.); *(.ccm*) __ccm_end = ABSOLUTE (.); } > ccm
+    .sram hal_virtual_vector_table_end : AT ((LOADADDR (.ccm) + SIZEOF (.ccm) + (4) - 1) & ~ ((4) - 1)) { __sram_data_start = ABSOLUTE (.); *(.sram*) . = ALIGN (4); } > ram __srom_data_start = LOADADDR (.sram); __sram_data_end = .; PROVIDE (__sram_data_end = .); PROVIDE (__srom_data_end = LOADADDR (.sram) + SIZEOF(.sram));
     .data ALIGN( 0x8) : AT ((LOADADDR (.sram) + SIZEOF (.sram) + (4) - 1) & ~ ((4) - 1)) { __ram_data_start = ABSOLUTE (.); *(.data*) *(.data1) *(.gnu.linkonce.d.*) . = ALIGN (4); KEEP(*( SORT (.ecos.table.*))) ; . = ALIGN (4); __init_array_start__ = ABSOLUTE (.); KEEP (*(SORT (.init_array.*))) KEEP (*(SORT (.init_array))) __init_array_end__ = ABSOLUTE (.); *(.dynamic) *(.sdata*) *(.gnu.linkonce.s.*) . = ALIGN (4); *(.2ram.*) } > ram __rom_data_start = LOADADDR (.data); __ram_data_end = .; PROVIDE (__ram_data_end = .); _edata = .; PROVIDE (edata = .); PROVIDE (__rom_data_end = LOADADDR (.data) + SIZEOF(.data));
     .bss ALIGN (0x8) : { __bss_start = ABSOLUTE (.); *(.scommon) *(.dynsbss) *(.sbss*) *(.gnu.linkonce.sb.*) *(.dynbss) *(.bss*) *(.gnu.linkonce.b.*) *(COMMON) __bss_end = ABSOLUTE (.); } > ram
     __heap1 = ALIGN (0x8);

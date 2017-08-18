@@ -6,17 +6,17 @@
 
 #include "rgb.h"
 
-#define WS281x_OUTPUT_PORT  CYGHWR_HAL_STM32_GPIOC
+#define WS281x_OUTPUT_PORT  CYGHWR_HAL_STM32_GPIOE
 #define WS281x_ODR (WS281x_OUTPUT_PORT + CYGHWR_HAL_STM32_GPIO_ODR)
 
 #define DMA_CONTROLLER_RCC  CYGHWR_HAL_STM32_CLOCK(AHB1, DMA2)
 #define DMA_CONTROLLER_REG  CYGHWR_HAL_STM32_DMA2
-#define DMA_UPDATE_STREAM   6
-#define DMA_UPDATE_CHANNEL  6
-#define DMA_RESET_STREAM    1
-#define DMA_RESET_CHANNEL   6
-#define DMA_BUFFER_STREAM   2
-#define DMA_BUFFER_CHANNEL  6
+#define DMA_SET_STREAM_CH1      1
+#define DMA_SET_CHANNEL_CH1     6
+#define DMA_BUFFER_STREAM_CH2   2
+#define DMA_BUFFER_CHANNEL_CH2  6
+#define DMA_RESET_STREAM_CH3    6
+#define DMA_RESET_CHANNEL_CH3   6
 
 #define CC_TIMER_RCC        CYGHWR_HAL_STM32_CLOCK(APB2, TIM1)
 #define CC_TIMER            CYGHWR_HAL_STM32_TIM1
@@ -32,6 +32,7 @@ public:
 private:
     static cWS281xDriver *__instance;
 
+    cyg_bool mPainted;
     cyg_uint8 *mBuffer;
     cyg_uint32 mBitCount;
     cyg_uint32 mPixelCount;
