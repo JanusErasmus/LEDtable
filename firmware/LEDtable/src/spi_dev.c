@@ -16,7 +16,7 @@ CYG_DEVS_SPI_CORTEXM_STM32_DEVICE(BLE_spi_dev       , 1, 0, false, 0,0,5000000,2
 
 CYG_DEVS_SPI_CORTEXM_STM32_DEVICE(stm32_flash_dev   , 3, 0, false, 0,0,6000000,1,4,1)
 
-//CYG_DEVS_FLASH_SPI_AT25DFXXX_DRIVER(dataflash, 0, &stm32_flash_dev.spi_bus);
+CYG_DEVS_FLASH_SPI_AT25DFXXX_DRIVER(dataflash, 0, &stm32_flash_dev.spi_bus);
 
 #define TRACE(_x, ...) diag_printf( _x,  ##__VA_ARGS__)
 
