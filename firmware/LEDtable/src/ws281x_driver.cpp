@@ -32,6 +32,8 @@ cWS281xDriver::cWS281xDriver(eWS281xModel model, cyg_uint32 pixel_count, cyg_uin
     mBitCount = (24 * mPixelCount);
 
     mBuffer = (cyg_uint8*)malloc(mBitCount + 8);
+    mBuffer[0] = 0;
+
     resetPixels();
 
     for (int k = 0; k < count; k++)
@@ -41,6 +43,8 @@ cWS281xDriver::cWS281xDriver(eWS281xModel model, cyg_uint32 pixel_count, cyg_uin
 
     setupDMA_MEM2MEM();
     setupTimer(model);
+
+    paint();
 }
 
 void cWS281xDriver::resetPixels()
@@ -145,12 +149,12 @@ void cWS281xDriver::setupTimer(cyg_uint32 clockSpeed)
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR1, setCount);
 
 //----------------- Setup reset timing for a ONE ------------------------------
-    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR2, resetCount);
+    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CCR4, resetCount);
 
-    reg32 = (1 << 1) |
-            (1 << 11)                        |   //update DMA request
-            (1 << 9)                        |   //CC1 DMA request
-            (1 << 10);                          //CC2 DMA request
+    reg32 =
+            (1 << 11)   |   //update DMA request
+            (1 << 9)    |   //CC1 DMA request
+            (1 << 12);      //CC4 DMA request
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_DIER, reg32);
 
     reg32 =  CYGHWR_HAL_STM32_TIM_CR1_ARPE;//   | //enable auto reload register
@@ -174,9 +178,9 @@ void setString(cyg_uint8 *buffer, cyg_uint8 string, cyg_uint8 colorByte)
 
 void setStringColor(cyg_uint8 *buffer, cyg_uint8 string, cRGB color)
 {
-    setString(buffer        , string, (color.G & 0xFF) >> 2 );
-    setString(&buffer[8]    , string, (color.R & 0xFF) >> 2 );
-    setString(&buffer[16]   , string, (color.B & 0xFF) >> 2 );
+    setString(buffer        , string, color.G );
+    setString(&buffer[8]    , string, color.R );
+    setString(&buffer[16]   , string, color.B );
 }
 
 void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
@@ -185,30 +189,10 @@ void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
    cyg_uint8 string = x/2;
    cyg_uint8 count = y;
 
-//   if((x == 15) || (x == 14)|| (x == 11) || (x == 10) || (x == 9) ||
-//         ((x == 12) && (y == 0)) ||
-//         ((x == 13) && (y == 0)) ||
-//         ((x == 13) && (y == 1)) ||
-//         ((x == 13) && (y == 2)) ||
-//         ((x == 13) && (y == 3)) ||
-//         ((x == 13) && (y == 4)) ||
-//         ((x == 13) && (y == 5))
-//   )
-//   {
-//      if(color.R && (color.R < 235))
-//         color.R += 20;
-//
-//      if(color.G && (color.G < 235))
-//         color.G += 20;
-//
-//      if(color.B && (color.B < 235))
-//      {
-//         if(color.B > 15)
-//            color.B += 20;
-//         else
-//            color.B += 10;
-//      }
-//   }
+
+//   color.R = color.R >> 2;
+//   color.G = color.G >> 2;
+//   color.B = color.B >> 2;
 
    if(x%2)
    {
@@ -256,18 +240,12 @@ void cWS281xDriver::paint()
 //    PRINT_REG(DMA_CONTROLLER_REG, CYGHWR_HAL_STM32_DMA_SM0AR( DMA_BUFFER_STREAM ));
 //    PRINT_REG(DMA_CONTROLLER_REG, CYGHWR_HAL_STM32_DMA_SM0AR( DMA_RESET_STREAM ));
 
-	HAL_READ_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_SR, reg32);
-	reg32 = 0;
-	HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_SR, reg32);
-    HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CNT, reg32);
-
-
     reg32 = 0xFFFFFFFF;
     HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_LIFCR, reg32);
     HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_HIFCR, reg32);
 
 //	HAL_WRITE_UINT32(WS281x_ODR, reg32);
-	cyg_thread_delay(1);
+//	cyg_thread_delay(1);
 
     reg32 = 0xFFFFFFFF;
     HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_LIFCR, reg32);
@@ -294,7 +272,8 @@ void cWS281xDriver::paint()
 	HAL_WRITE_UINT32(DMA_CONTROLLER_REG + CYGHWR_HAL_STM32_DMA_SCR( DMA_BUFFER_STREAM ), CR);
 
 
-
+	reg32 = 0x100;
+	HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CNT, reg32);
     TIM_CR |= CYGHWR_HAL_STM32_TIM_CR1_CEN;
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CR1, TIM_CR);
 
@@ -370,65 +349,6 @@ void cWS281xDriver::setblue(cTerm & t,int argc,char *argv[])
    __instance->paint();
 }
 
-void cWS281xDriver::setBlackred(cTerm & t,int argc,char *argv[])
-{
-   if(!__instance)
-      return;
-
-   if(argc > 1)
-   {
-      cRGB color( atoi(argv[1]), 0, 0);
-
-      __instance->setBlackPixels(color);
-   }
-
-   __instance->paint();
-}
-
-void cWS281xDriver::setBlackgreen(cTerm & t,int argc,char *argv[])
-{
-   if(!__instance)
-      return;
-
-   if(argc > 1)
-   {
-      cRGB color(0, atoi(argv[1]), 0);
-
-      __instance->setBlackPixels(color);
-   }
-
-   __instance->paint();
-}
-
-void cWS281xDriver::setBlackblue(cTerm & t,int argc,char *argv[])
-{
-   if(!__instance)
-      return;
-
-   if(argc > 1)
-   {
-      cRGB color(0, 0, atoi(argv[1]));
-
-      __instance->setBlackPixels(color);
-   }
-
-   __instance->paint();
-}
-
-void cWS281xDriver::setBlackPixels(cRGB color)
-{
-   for(cyg_uint8 r = 0; r < 7; r++)
-   {
-      for(cyg_uint8 k = 0; k < 16; k++)
-      {
-         if((r == 2) || (r == 3))
-            continue;
-
-         setPixel(r, k, color);
-      }
-   }
-}
-
 const TermCMD::cmd_list_t wsCommands[] =
 {
       {"WS218x"    ,0,0,0},
@@ -436,8 +356,5 @@ const TermCMD::cmd_list_t wsCommands[] =
       {"r",       "set level", "Set all red", cWS281xDriver::setred},
       {"g",       "set level", "Set all green", cWS281xDriver::setgreen},
       {"b",       "set level", "Set all blue", cWS281xDriver::setblue},
-      {"br",       "set level", "Set all red", cWS281xDriver::setBlackred},
-      {"bg",       "set level", "Set all red", cWS281xDriver::setBlackgreen},
-      {"bb",       "set level", "Set all red", cWS281xDriver::setBlackblue},
       {0, 0, 0},
 };

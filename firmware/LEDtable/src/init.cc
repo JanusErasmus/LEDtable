@@ -14,6 +14,7 @@
 #include "kses_term.h"
 #include "output_port.h"
 #include "spi_dev.h"
+#include "spi_flash.h"
 #include "ws281x_driver.h"
 #include "ws281_receiver.h"
 #include "blue_device.h"
@@ -49,7 +50,7 @@ cInit::cInit() : cDebug("init")
 
 void initBLE()
 {
-   cyg_uint8 mac[] = {0x1C, 0xB2, 0x84, 0xC2, 0x50, 0x00};
+   cyg_uint8 mac[] = {0x1C, 0xB2, 0x84, 0xC2, 0x50, 0x01};
    char *BLEname = (char*)malloc(64);
    BLEname[0] = 0;
    sprintf(BLEname, "LED %d", mac[0]);
@@ -89,41 +90,41 @@ void cInit::init_thread(cyg_addrword_t args)
     };
     cWS281xDriver::init(cWS281xDriver::WS2812, 32, outputPortNumbers, 8);
 
-    initFlash();
+    SpiFlash::init();
     initBLE();
 
     WS281receiver *receiver = new WS281receiver();
     cTerm::init((char *)"/dev/tty1",128,"iLED>>");
     cTerm::setReceiver(receiver);
-//
-//    Animation *animations[] = {
-//       new RunnerAnimation(),
-//       new SpiralsAnimation(),
-//       new ColorAnimation(),
-//       new BigSpiralAnimation(),
-//       new GoombaAnimation()
-//    };
-//    int index = 4;
-//
-//    cyg_tick_count_t lastChange = cyg_current_time();
-//
-//    cWS281xDriver::get()->setAll(off);
-//    cWS281xDriver::get()->paint();
-//    animations[index]->run();
+
+    Animation *animations[] = {
+       new RunnerAnimation(),
+       new SpiralsAnimation(),
+       new ColorAnimation(),
+       new BigSpiralAnimation(),
+       new GoombaAnimation()
+    };
+    int index = 4;
+
+    cyg_tick_count_t lastChange = cyg_current_time();
+
+    cWS281xDriver::get()->setAll(off);
+    cWS281xDriver::get()->paint();
+    animations[index]->run();
 
     while(1)
     {
-//       if(animations[index])
-//          animations[index]->run();
-//       else
+       if(animations[index])
+          animations[index]->run();
+       else
           cyg_thread_delay(100);
-//
-//       if((cyg_current_time() - lastChange) > 3000)
-//       {
-//          lastChange = cyg_current_time();
-//          if(++index > 4)
-//             index = 0;
-//       }
+
+       if((cyg_current_time() - lastChange) > 3000)
+       {
+          lastChange = cyg_current_time();
+          if(++index > 4)
+             index = 0;
+       }
     }
 }
 

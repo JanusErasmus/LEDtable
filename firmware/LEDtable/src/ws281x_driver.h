@@ -15,7 +15,7 @@
 #define DMA_UPDATE_CHANNEL  6
 #define DMA_RESET_STREAM    1
 #define DMA_RESET_CHANNEL   6
-#define DMA_BUFFER_STREAM   2
+#define DMA_BUFFER_STREAM   4
 #define DMA_BUFFER_CHANNEL  6
 
 #define CC_TIMER_RCC        CYGHWR_HAL_STM32_CLOCK(APB2, TIM1)
@@ -44,8 +44,6 @@ private:
     cWS281xDriver(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count);
     virtual ~cWS281xDriver();
 
-    void setBlackPixels(cRGB color);
-
 public:
 
     static void init(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count);
@@ -64,9 +62,6 @@ public:
     static void setred(cTerm & t,int argc,char *argv[]);
     static void setgreen(cTerm & t,int argc,char *argv[]);
     static void setblue(cTerm & t,int argc,char *argv[]);
-    static void setBlackred(cTerm & t,int argc,char *argv[]);
-    static void setBlackgreen(cTerm & t,int argc,char *argv[]);
-    static void setBlackblue(cTerm & t,int argc,char *argv[]);
 };
 
 extern const TermCMD::cmd_list_t wsCommands[];
