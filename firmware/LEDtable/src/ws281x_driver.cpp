@@ -28,11 +28,10 @@ cWS281xDriver *cWS281xDriver::get()
 
 cWS281xDriver::cWS281xDriver(eWS281xModel model, cyg_uint32 pixel_count, cyg_uint32 *ports, cyg_uint8 count)
 {
-    mPixelCount = pixel_count + 1;
-    mBitCount = (24 * mPixelCount);
+    mPixelCount = pixel_count;
+    mBitCount = (24 * mPixelCount) + 1;
 
     mBuffer = (cyg_uint8*)malloc(mBitCount + 8);
-    mBuffer[0] = 0;
 
     resetPixels();
 
@@ -201,7 +200,7 @@ void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
    }
    //	diag_printf("string %d, count %d\n", string, count);
 
-   cyg_uint8 *buffer = &mBuffer[(count * 24)];
+   cyg_uint8 *buffer = &mBuffer[(count * 24) + 1];
    setStringColor(buffer, string, color);
 }
 
