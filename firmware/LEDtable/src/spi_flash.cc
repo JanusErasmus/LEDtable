@@ -94,9 +94,8 @@ void SpiFlash::global_unprotect()
 
 bool SpiFlash::read(cyg_uint32 addr, cyg_uint8 *data_ptr, cyg_uint32 len)
 {
-    int rLen = cyg_flash_read(addr, data_ptr, len, 0);
-    TRACE("R: %d\n", rLen);
-
+    if(cyg_flash_read(addr, data_ptr, len, 0) < 0)
+       return false;
 
 	return true;
 }
@@ -105,16 +104,16 @@ bool SpiFlash::write(cyg_uint32 addr, cyg_uint8 *data_ptr, cyg_uint32 len)
 {
     bool stat = false;
 
-    int wLen = cyg_flash_program(addr, data_ptr, len, 0);
-    TRACE("W: %d\n", wLen);
+    if(cyg_flash_program(addr, data_ptr, len, 0) < 0)
+       return false;
 
 	return stat;
 }
 
 bool SpiFlash::erase(cyg_uint32 addr)
 {
-    int rLen = cyg_flash_erase(addr, 0x10, 0);
-    TRACE("E: %d\n", rLen);
+    if(cyg_flash_erase(addr, 0x10, 0) < 0)
+       return false;
 
 	return true;
 }

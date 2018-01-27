@@ -14,10 +14,10 @@
 #include "kses_term.h"
 #include "output_port.h"
 #include "spi_dev.h"
-#include "spi_flash.h"
 #include "ws281x_driver.h"
 #include "ws281_receiver.h"
 #include "blue_device.h"
+#include "spi_flash.h"
 
 #include "BigSpiralAnimation.h"
 #include "ColorAnimation.h"
@@ -50,7 +50,7 @@ cInit::cInit() : cDebug("init")
 
 void initBLE()
 {
-   cyg_uint8 mac[] = {0x1C, 0xB2, 0x84, 0xC2, 0x50, 0x01};
+   cyg_uint8 mac[] = {0x1C, 0xB2, 0x84, 0xC2, 0x50, 0x00};
    char *BLEname = (char*)malloc(64);
    BLEname[0] = 0;
    sprintf(BLEname, "LED %d", mac[0]);
@@ -110,21 +110,62 @@ void cInit::init_thread(cyg_addrword_t args)
 
     cWS281xDriver::get()->setAll(off);
     cWS281xDriver::get()->paint();
-    animations[index]->run();
+
+    cyg_uint8 buffer[1024];
+//    memset(buffer, 0, 8);
+//    buffer[0] = 0xF0;
+//    cyg_spi_transfer(&stm32_flash_dev, false, 1, buffer, buffer);
+//    buffer[0] = 0x30;
+//    cyg_spi_transfer(&stm32_flash_dev, false, 1, buffer, buffer);
+//    buffer[0] = 0x06;
+//    cyg_spi_transfer(&stm32_flash_dev, false, 1, buffer, buffer);
+//
+//    memset(buffer, 0, 8);
+//    buffer[0] = 0x01;
+//    cyg_spi_transfer(&stm32_flash_dev, false, 3, buffer, buffer);
+//    diag_dump_buf(buffer, 8);
+//
+//    memset(buffer, 0, 8);
+//    buffer[0] = 0x05;
+//    cyg_spi_transfer(&stm32_flash_dev, false, 8, buffer, buffer);
+//    diag_dump_buf(buffer, 8);
+//
+//    memset(buffer, 0, 8);
+//    buffer[0] = 0x07;
+//    cyg_spi_transfer(&stm32_flash_dev, false, 8, buffer, buffer);
+//    diag_dump_buf(buffer, 8);
+//
+//
+//        animations[index]->run();
+//        animations[index]->run();
+//        cWS281xDriver::get()->getBuffer(buffer, 1024);
+//        SpiFlash::get()->erase(0x400);
+//        SpiFlash::get()->write(0x00, buffer, 1024);
+
+
+
 
     while(1)
     {
-       if(animations[index])
-          animations[index]->run();
-       else
-          cyg_thread_delay(100);
+//       if(animations[index])
+//          animations[index]->run();
+//       else
+       SpiFlash::get()->read(0, buffer, 1024);
+       cWS281xDriver::get()->setBuffer(buffer, 1024);
+       cWS281xDriver::get()->paint();
+          cyg_thread_delay(50);
+          SpiFlash::get()->read(0x400, buffer, 1024);
+          cWS281xDriver::get()->setBuffer(buffer, 1024);
+          cWS281xDriver::get()->paint();
+          cyg_thread_delay(50);
 
-       if((cyg_current_time() - lastChange) > 3000)
-       {
-          lastChange = cyg_current_time();
-          if(++index > 4)
-             index = 0;
-       }
+//
+//       if((cyg_current_time() - lastChange) > 3000)
+//       {
+//          lastChange = cyg_current_time();
+//          if(++index > 4)
+//             index = 0;
+//       }
     }
 }
 
