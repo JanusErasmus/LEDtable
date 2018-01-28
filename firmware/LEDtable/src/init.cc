@@ -142,23 +142,30 @@ void cInit::init_thread(cyg_addrword_t args)
 //        SpiFlash::get()->erase(0x400);
 //        SpiFlash::get()->write(0x00, buffer, 1024);
 
+    //       SpiFlash::get()->read(0, buffer, 1024);
+    //       cWS281xDriver::get()->setBuffer(buffer, 1024);
+    //       cWS281xDriver::get()->paint();
+    //          cyg_thread_delay(50);
+    //          SpiFlash::get()->read(0x400, buffer, 1024);
+    //          cWS281xDriver::get()->setBuffer(buffer, 1024);
+    //          cWS281xDriver::get()->paint();
+    //          cyg_thread_delay(50);
 
 
-
+    cyg_uint32 address = 0xF0000;
     while(1)
     {
 //       if(animations[index])
 //          animations[index]->run();
 //       else
-       SpiFlash::get()->read(0, buffer, 1024);
-       cWS281xDriver::get()->setBuffer(buffer, 1024);
-       cWS281xDriver::get()->paint();
-          cyg_thread_delay(50);
-          SpiFlash::get()->read(0x400, buffer, 1024);
-          cWS281xDriver::get()->setBuffer(buffer, 1024);
-          cWS281xDriver::get()->paint();
-          cyg_thread_delay(50);
+        SpiFlash::get()->read(address, buffer, 1024);
+        cWS281xDriver::get()->setBuffer(buffer, 1024);
+        cWS281xDriver::get()->paint();
+        cyg_thread_delay(20);
 
+        address += 0x400;
+        if(address > 0xF7C00)
+            address = 0xF0000;
 //
 //       if((cyg_current_time() - lastChange) > 3000)
 //       {

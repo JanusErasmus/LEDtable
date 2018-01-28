@@ -1,10 +1,10 @@
-QT += core serialport
-QT -= gui
+QT += core serialport gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
 TARGET = txbmp
-CONFIG += console
 CONFIG -= app_bundle
 
 TEMPLATE = app
@@ -12,7 +12,9 @@ TEMPLATE = app
 SOURCES += main.cpp \
     hdlc_sender.cpp \
     hdlc.cpp \
-    bmp_reader.cpp
+    bmp_reader.cpp \
+    mainwindow.cpp \
+    serial_listener.cpp
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -28,18 +30,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 HEADERS += \
     hdlc_sender.h \
     hdlc.h \
-    bmp_reader.h
+    bmp_reader.h \
+    mainwindow.h \
+    serial_listener.h
 
 win32 {
-INCLUDEPATH += "C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt"
-LIBS += -L"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.10240.0/ucrt/x64"
+    INCLUDEPATH += "C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt"
+    LIBS += -L"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.10240.0/ucrt/x64"
 
 
-win32:contains(QMAKE_HOST.arch, x86_64) {
-    LIBS += -L$$PWD/../libusb/lib_x64
-} else {
-    LIBS += -L"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10240.0\um\x86"
-    LIBS += -L"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10240.0\ucrt\x86"
-    #LIBS += -llegacy_stdio_definitions
+    win32:contains(QMAKE_HOST.arch, x86_64) {
+        LIBS += -L$$PWD/../libusb/lib_x64
+    } else {
+        LIBS += -L"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10240.0\um\x86"
+        LIBS += -L"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.10240.0\ucrt\x86"
+        #LIBS += -llegacy_stdio_definitions
+    }
 }
-}
+
+FORMS += \
+    mainwindow.ui

@@ -62,6 +62,8 @@ public:
     static void setred(cTerm & t,int argc,char *argv[]);
     static void setgreen(cTerm & t,int argc,char *argv[]);
     static void setblue(cTerm & t,int argc,char *argv[]);
+    static void saveBuffer(cTerm & t,int argc,char *argv[]);
+    static void loadBuffer(cTerm & t,int argc,char *argv[]);
 };
 
 extern const TermCMD::cmd_list_t wsCommands[];

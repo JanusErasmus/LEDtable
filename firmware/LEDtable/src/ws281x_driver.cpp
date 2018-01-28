@@ -5,7 +5,7 @@
 
 #include <utils.h>
 #include "ws281x_driver.h"
-
+#include "spi_flash.h"
 
 #define TRACE(_x, ...) INFO_TRACE("cWS281xDriver", _x,  ##__VA_ARGS__)
 extern cyg_uint32 hal_stm32_pclk2;
@@ -189,9 +189,9 @@ void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
    cyg_uint8 count = y;
 
 
-//   color.R = color.R >> 2;
-//   color.G = color.G >> 2;
-//   color.B = color.B >> 2;
+   color.R = color.R >> 1;
+   color.G = color.G >> 1;
+   color.B = color.B >> 1;
 
    if(x%2)
    {
@@ -348,6 +348,39 @@ void cWS281xDriver::setblue(cTerm & t,int argc,char *argv[])
    __instance->paint();
 }
 
+void cWS281xDriver::saveBuffer(cTerm & t,int argc,char *argv[])
+{
+   if(!__instance)
+      return;
+
+   if(argc > 1)
+   {
+       cyg_uint32 addr = strtoul(argv[1], 0, 16);
+       cyg_uint8 buffer[1024];
+       __instance->getBuffer(buffer, 1024);
+       SpiFlash::get()->write(addr, buffer, 1024);
+       __instance->paint();
+
+       diag_printf("Saved to 0x%08X\n", addr);
+   }
+}
+
+void cWS281xDriver::loadBuffer(cTerm & t,int argc,char *argv[])
+{
+   if(!__instance)
+      return;
+
+   if(argc > 1)
+   {
+       cyg_uint32 addr = strtoul(argv[1], 0, 16);
+       cyg_uint8 buffer[1024];
+       SpiFlash::get()->read(addr, buffer, 1024);
+       __instance->setBuffer(buffer, 1024);
+       __instance->paint();
+       diag_printf("load from 0x%08X\n", addr);
+   }
+}
+
 const TermCMD::cmd_list_t wsCommands[] =
 {
       {"WS218x"    ,0,0,0},
@@ -355,5 +388,7 @@ const TermCMD::cmd_list_t wsCommands[] =
       {"r",       "set level", "Set all red", cWS281xDriver::setred},
       {"g",       "set level", "Set all green", cWS281xDriver::setgreen},
       {"b",       "set level", "Set all blue", cWS281xDriver::setblue},
+      {"save",    "<addr>", "Save current  BMP", cWS281xDriver::saveBuffer},
+      {"load",    "<addr>", "Load BMP", cWS281xDriver::loadBuffer},
       {0, 0, 0},
 };

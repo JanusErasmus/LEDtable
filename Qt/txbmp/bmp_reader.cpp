@@ -5,7 +5,7 @@
 BMPreader::BMPreader(const char *fileName)
 {
     mFP = fopen(fileName, "r");
-    if(mFP > 0)
+    if(mFP)
     {
         qInfo("File %s opened\n", fileName);
 
@@ -46,7 +46,7 @@ int BMPreader::getBuffer(unsigned char *buffer, int len)
 
 BMPreader::~BMPreader()
 {
-    if(mFP > 0)
+    if(mFP)
     {
         fclose(mFP);
     }
