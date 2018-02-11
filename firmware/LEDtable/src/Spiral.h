@@ -8,6 +8,7 @@
 #ifndef SRC_SPIRAL_H_
 #define SRC_SPIRAL_H_
 #include <cyg/kernel/kapi.h>
+#include "pixel_display.h"
 
 class Direction
 {
@@ -20,6 +21,8 @@ public:
 
 class Spiral
 {
+   PixelDisplay *mDisplay;
+
    cyg_uint8 mXstart, mYstart;
    cyg_int8 mXtopMargin, mYtopMargin, mXbottomMargin, mYbottomMargin;
 
@@ -35,7 +38,9 @@ class Spiral
    cyg_bool collide(cyg_uint8 currentX, cyg_uint8 currentY, Direction *direction);
 
 public:
-   Spiral(cyg_uint8 Xstart,
+   Spiral(
+         PixelDisplay *display,
+         cyg_uint8 Xstart,
          cyg_uint8 Ystart,
          cyg_uint8 XtopMargin,
          cyg_uint8 YtopMargin,

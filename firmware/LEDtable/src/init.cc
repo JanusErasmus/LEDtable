@@ -12,6 +12,12 @@
 #include "init.h"
 #include "led.h"
 #include "kses_term.h"
+
+#include "animation_big_spiral.h"
+#include "animation_color.h"
+#include "animation_goomba.h"
+#include "animation_runner.h"
+#include "animation_spirals.h"
 #include "output_port.h"
 #include "spi_dev.h"
 #include "ws281x_driver.h"
@@ -19,11 +25,6 @@
 #include "blue_device.h"
 #include "spi_flash.h"
 
-#include "BigSpiralAnimation.h"
-#include "ColorAnimation.h"
-#include "GoombaAnimation.h"
-#include "SpiralsAnimation.h"
-#include "RunnerAnimation.h"
 
 #define TRACE(_x, ...) INFO_TRACE("cInit", _x,  ##__VA_ARGS__)
 
@@ -99,12 +100,21 @@ void cInit::init_thread(cyg_addrword_t args)
     cTerm::init((char *)"/dev/tty1",128,"LED>>");
     cTerm::setReceiver(receiver);
 
+    cWS281xDriver *display = cWS281xDriver::get();
+    CharPrinter Jprinter(display);
+    Jprinter.setString("  Erasmus", yellow, red);
+
+    CharPrinter Cprinter(display);
+    Cprinter.setString("  Cherise", blue, green);
+
     Animation *animations[] = {
-       new ColorAnimation(),
-       new RunnerAnimation(),
-       new SpiralsAnimation(),
-       new BigSpiralAnimation(),
-       new GoombaAnimation()
+         &Jprinter,
+       new ColorAnimation(display),
+       new RunnerAnimation(display),
+       new SpiralsAnimation(display),
+       &Cprinter,
+       new BigSpiralAnimation(display),
+       new GoombaAnimation(display)
     };
     int index = 0;
 
@@ -153,25 +163,19 @@ void cInit::init_thread(cyg_addrword_t args)
     //          cWS281xDriver::get()->paint();
 //              cyg_thread_delay(50);
 
-    cWS281xDriver::get()->setAll(blue);
-    CharPrinter p(cWS281xDriver::get());
-    p.setString("  Janus Erasmus", yellow, red);
-
     while(1)
     {
-//       if(animations[index])
-//          animations[index]->run();
-//       //else
-//
-//       if((cyg_current_time() - lastChange) > 6000)
-//       {
-//          lastChange = cyg_current_time();
-//          if(++index > 4)
-//             index = 0;
-//       }
+       if(animations[index])
+          animations[index]->run();
+       //else
 
-       p.run();
-       cyg_thread_delay(15);
+       if((cyg_current_time() - lastChange) > 6000)
+       {
+          lastChange = cyg_current_time();
+          if(++index > 6)
+             index = 0;
+       }
+
     }
 }
 

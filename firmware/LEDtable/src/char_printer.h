@@ -1,5 +1,6 @@
 #ifndef SRC_CHAR_PRINTER_H_
 #define SRC_CHAR_PRINTER_H_
+#include "animation.h"
 #include "pixel_display.h"
 
 class CharObject
@@ -17,12 +18,11 @@ public:
    void print();
 };
 
-class CharPrinter
+class CharPrinter : public Animation
 {
    cRGB mFont;
    cRGB mBackground;
    cyg_uint16 *mFrame;
-   PixelDisplay *mDisplay;
    int mStringWidth;
    int mCurrrentShift;
 

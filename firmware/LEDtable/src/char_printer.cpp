@@ -49,7 +49,7 @@ void CharObject::print()
    }
 }
 
-CharPrinter::CharPrinter(PixelDisplay *display) : mDisplay(display)
+CharPrinter::CharPrinter(PixelDisplay *display) : Animation(display)
 {
    mFrame = 0;
    mCurrrentShift = 0;
@@ -136,6 +136,7 @@ void CharPrinter::run()
       mCurrrentShift = 0;
 
    mDisplay->paint();
+   cyg_thread_delay(15);
 }
 CharPrinter::~CharPrinter()
 {

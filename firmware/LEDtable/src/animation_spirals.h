@@ -1,6 +1,6 @@
-#ifndef SRC_SPIRALSANIMATION_H_
-#define SRC_SPIRALSANIMATION_H_
-#include "Animation.h"
+#ifndef SRC_ANIMATION_SPIRALS_H_
+#define SRC_ANIMATION_SPIRALS_H_
+#include "animation.h"
 #include "Spiral.h"
 
 class SpiralsAnimation : public Animation
@@ -11,10 +11,10 @@ class SpiralsAnimation : public Animation
    Spiral string4;
 
 public:
-   SpiralsAnimation();
+   SpiralsAnimation(PixelDisplay *display);
    virtual ~SpiralsAnimation();
 
    void run();
 };
 
-#endif /* SRC_SPIRALSANIMATION_H_ */
+#endif /* SRC_ANIMATION_SPIRALS_H_ */

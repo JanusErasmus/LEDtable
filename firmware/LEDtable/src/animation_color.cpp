@@ -1,10 +1,8 @@
 #include <stdlib.h>
 
-#include "ColorAnimation.h"
-#include "ws281x_driver.h"
-#include "rgb.h"
+#include "animation_color.h"
 
-ColorAnimation::ColorAnimation()
+ColorAnimation::ColorAnimation(PixelDisplay *display) : Animation(display)
 {
    mColor = 0;
 }
@@ -16,8 +14,8 @@ void ColorAnimation::run()
    while((mColor == prevColor) && (mColor > PCOLOR_COUNT))
          mColor = rand() % 20;
 
-   cWS281xDriver::get()->setAll(*pColor[mColor]);
-   cWS281xDriver::get()->paint();
+   mDisplay->setAll(*pColor[mColor]);
+   mDisplay->paint();
    cyg_thread_delay(100);
 }
 

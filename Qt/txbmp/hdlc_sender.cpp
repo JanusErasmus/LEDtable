@@ -142,7 +142,7 @@ void HDLCsender::readData()
 //                }
                 QString code = QString(mBuffer).trimmed();
                 code.remove(QRegExp(QString::fromUtf8("[-`~!@#$%^&*()_—+=|:;<>«»,.?")));
-                qDebug() << "RX: " << code;
+                //qDebug() << "RX: " << code;
 
                 mBuffer.clear();
             }

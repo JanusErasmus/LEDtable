@@ -1,4 +1,4 @@
-QT += core serialport gui
+QT += core serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,7 +13,6 @@ SOURCES += main.cpp \
     hdlc_sender.cpp \
     hdlc.cpp \
     bmp_reader.cpp \
-    mainwindow.cpp \
     serial_listener.cpp
 
 # The following define makes your compiler emit warnings if you use
@@ -31,7 +30,6 @@ HEADERS += \
     hdlc_sender.h \
     hdlc.h \
     bmp_reader.h \
-    mainwindow.h \
     serial_listener.h
 
 win32 {

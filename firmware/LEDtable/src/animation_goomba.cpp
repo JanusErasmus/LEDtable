@@ -1,8 +1,8 @@
-#include "GoombaAnimation.h"
-#include "ws281x_driver.h"
+#include "animation_goomba.h"
+
 #include "spi_flash.h"
 
-GoombaAnimation::GoombaAnimation()
+GoombaAnimation::GoombaAnimation(PixelDisplay *display) : Animation(display)
 {
    mAddress = 0xF0000;
 }
@@ -11,8 +11,8 @@ void GoombaAnimation::run()
 {
    cyg_uint8 buffer[1024];
    SpiFlash::get()->read(mAddress, buffer, 1024);
-   cWS281xDriver::get()->setBuffer(buffer, 1024);
-   cWS281xDriver::get()->paint();
+   mDisplay->setBuffer(buffer, 1024);
+   mDisplay->paint();
    cyg_thread_delay(20);
 
    mAddress += 0x400;
