@@ -14,7 +14,7 @@ class Runner
 	cyg_uint8 mX;
     cyg_int8 mY;
     cyg_int8 mDiff;
-    cyg_uint8 cColor;
+    cyg_uint8 mColor;
 
 public:
 	Runner();

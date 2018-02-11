@@ -15,12 +15,12 @@ Runner::Runner()
 	mDiff = 1;
 	mY = 0;
 	mX = 0;
-	cColor = 1;
+	mColor = 1;
 }
 
 void Runner::run()
 {
-    cWS281xDriver::get()->setPixel(mX, mY, *pColor[cColor]);
+    cWS281xDriver::get()->setPixel(mX, mY, *pColor[mColor]);
 }
 
 void Runner::next()
@@ -47,7 +47,10 @@ void Runner::next()
 		mX = 0;
 		mY = 0;
 
-		cColor++;
+		   cyg_uint8 prevColor = mColor;
+		   mColor = rand() % 20;
+		   while((mColor == prevColor) && (mColor > PCOLOR_COUNT))
+		         mColor = rand() % 20;
 	}
 //	mY += mDiff;
 //
@@ -66,8 +69,7 @@ void Runner::next()
 //		cColor++;
 //	}
 
-	if(!pColor[cColor])
-		cColor = 0;
+
 
 //	diag_printf("%d, %d\n", mX, mY);
 }

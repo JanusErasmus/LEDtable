@@ -3,8 +3,7 @@
 #include <cyg/kernel/kapi.h>
 
 #include "TermCMD.h"
-
-#include "rgb.h"
+#include "pixel_display.h"
 
 #define WS281x_OUTPUT_PORT  CYGHWR_HAL_STM32_GPIOC
 #define WS281x_ODR (WS281x_OUTPUT_PORT + CYGHWR_HAL_STM32_GPIO_ODR)
@@ -21,7 +20,7 @@
 #define CC_TIMER_RCC        CYGHWR_HAL_STM32_CLOCK(APB2, TIM1)
 #define CC_TIMER            CYGHWR_HAL_STM32_TIM1
 
-class cWS281xDriver
+class cWS281xDriver : public PixelDisplay
 {
 public:
     enum eWS281xModel

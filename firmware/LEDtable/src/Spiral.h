@@ -26,7 +26,7 @@ class Spiral
    Direction *mDirection;
    cyg_int8 mXtopLimit, mYtopLimit, mXbottomLimit, mYbottomLimit;
    cyg_uint8 mX, mY;
-   cyg_uint8 cColor;
+   cyg_uint8 mColor;
    cyg_int8 cDirection;
 
    cyg_int8 mDirDiff;
@@ -46,7 +46,7 @@ public:
    void run();
    void next();
 
-   void startColor(cyg_uint8 index){ cColor = index; };
+   void startColor(cyg_uint8 index){ mColor = index; };
 };
 
 

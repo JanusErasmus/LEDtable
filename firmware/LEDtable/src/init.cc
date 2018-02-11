@@ -29,6 +29,8 @@
 
 cInit * cInit::__instance = 0;
 
+#include "char_printer.h"
+
 cInit::cInit() : cDebug("init")
 {
     __instance = this;
@@ -91,27 +93,27 @@ void cInit::init_thread(cyg_addrword_t args)
     cWS281xDriver::init(cWS281xDriver::WS2812, 32, outputPortNumbers, 8);
 
     SpiFlash::init();
-    initBLE();
+//    initBLE();
 
     WS281receiver *receiver = new WS281receiver();
-    cTerm::init((char *)"/dev/tty1",128,"iLED>>");
+    cTerm::init((char *)"/dev/tty1",128,"LED>>");
     cTerm::setReceiver(receiver);
 
     Animation *animations[] = {
+       new ColorAnimation(),
        new RunnerAnimation(),
        new SpiralsAnimation(),
-       new ColorAnimation(),
        new BigSpiralAnimation(),
        new GoombaAnimation()
     };
-    int index = 4;
+    int index = 0;
 
     cyg_tick_count_t lastChange = cyg_current_time();
 
     cWS281xDriver::get()->setAll(off);
     cWS281xDriver::get()->paint();
 
-    cyg_uint8 buffer[1024];
+//    cyg_uint8 buffer[1024];
 //    memset(buffer, 0, 8);
 //    buffer[0] = 0xF0;
 //    cyg_spi_transfer(&stm32_flash_dev, false, 1, buffer, buffer);
@@ -149,30 +151,27 @@ void cInit::init_thread(cyg_addrword_t args)
     //          SpiFlash::get()->read(0x400, buffer, 1024);
     //          cWS281xDriver::get()->setBuffer(buffer, 1024);
     //          cWS281xDriver::get()->paint();
-    //          cyg_thread_delay(50);
+//              cyg_thread_delay(50);
 
+    cWS281xDriver::get()->setAll(blue);
+    CharPrinter p(cWS281xDriver::get());
+    p.setString("  Janus Erasmus", yellow, red);
 
-    cyg_uint32 address = 0xF0000;
     while(1)
     {
 //       if(animations[index])
 //          animations[index]->run();
-//       else
-        SpiFlash::get()->read(address, buffer, 1024);
-        cWS281xDriver::get()->setBuffer(buffer, 1024);
-        cWS281xDriver::get()->paint();
-        cyg_thread_delay(20);
-
-        address += 0x400;
-        if(address > 0xF7C00)
-            address = 0xF0000;
+//       //else
 //
-//       if((cyg_current_time() - lastChange) > 3000)
+//       if((cyg_current_time() - lastChange) > 6000)
 //       {
 //          lastChange = cyg_current_time();
 //          if(++index > 4)
 //             index = 0;
 //       }
+
+       p.run();
+       cyg_thread_delay(15);
     }
 }
 

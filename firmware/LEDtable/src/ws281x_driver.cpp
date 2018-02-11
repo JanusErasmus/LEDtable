@@ -184,6 +184,9 @@ void setStringColor(cyg_uint8 *buffer, cyg_uint8 string, cRGB color)
 
 void cWS281xDriver::setPixel(cyg_uint8 x, cyg_uint8 y, cRGB color)
 {
+   if((x > 15) || (y > 15))
+      return;
+
    x = 15 - x;
    cyg_uint8 string = x/2;
    cyg_uint8 count = y;
@@ -276,6 +279,7 @@ void cWS281xDriver::paint()
     TIM_CR |= CYGHWR_HAL_STM32_TIM_CR1_CEN;
     HAL_WRITE_UINT32(CC_TIMER + CYGHWR_HAL_STM32_TIM_CR1, TIM_CR);
 
+    cyg_thread_delay(1);
 }
 
 cWS281xDriver::~cWS281xDriver()

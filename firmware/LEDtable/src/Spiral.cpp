@@ -1,6 +1,7 @@
+#include <stdlib.h>
+
 #include "Spiral.h"
 #include "ws281x_driver.h"
-
 
 static Direction DirectionUp = Direction(0,1);
 static Direction DirectionDown = Direction(0,-1);
@@ -29,14 +30,14 @@ Spiral::Spiral(cyg_uint8 Xstart, cyg_uint8 Ystart, cyg_uint8 XtopMargin, cyg_uin
    mY = mYstart;
 
    cDirection = 0;
-   cColor = 1;
+   mColor = 1;
    mDirDiff = 1;
 
 }
 
 void Spiral::run()
 {
-   cWS281xDriver::get()->setPixel(mX, mY, *pColor[cColor]);
+   cWS281xDriver::get()->setPixel(mX, mY, *pColor[mColor]);
 }
 
 cyg_bool Spiral::collide(cyg_uint8 currentX, cyg_uint8 currentY, Direction *direction)
@@ -132,9 +133,10 @@ void Spiral::next()
       mX = mXstart;
       mY = mYstart;
 
-      cColor++;
-      if(!pColor[cColor])
-            cColor = 0;
+      cyg_uint8 prevColor = mColor;
+      mColor = rand() % 20;
+      while((mColor == prevColor) && (mColor > PCOLOR_COUNT))
+            mColor = rand() % 20;
    }
 
 //   diag_printf("%d, %d\n", mX, mY);
