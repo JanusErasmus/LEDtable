@@ -1,4 +1,6 @@
 release
 lib
 .settings
-/Release/
+.cproject
+.project
+release

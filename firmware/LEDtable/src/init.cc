@@ -25,8 +25,7 @@
 #include "blue_device.h"
 #include "spi_flash.h"
 
-
-#define TRACE(_x, ...) INFO_TRACE("cInit", _x,  ##__VA_ARGS__)
+    #define TRACE(_x, ...) INFO_TRACE("cInit", _x,  ##__VA_ARGS__)
 
 cInit * cInit::__instance = 0;
 
@@ -45,9 +44,6 @@ cInit::cInit() : cDebug("init")
             &mLEDThreadHandle,
             &mLEDThread);
     cyg_thread_resume(mLEDThreadHandle);
-
-    //diag_printf("pixelCount %d\n", mBitCount);
-    //diag_dump_buf(mBuffer, mBitCount);
 
 }
 
