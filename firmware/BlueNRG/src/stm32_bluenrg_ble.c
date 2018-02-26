@@ -128,7 +128,7 @@ void BlueNRG_RST(void)
 	cyg_interrupt_mask(mExtInterrupt);
 
 	CYGHWR_HAL_STM32_GPIO_OUT(mResetPin, 0);
-	cyg_thread_delay(20);
+	cyg_thread_delay(100);
 	CYGHWR_HAL_STM32_GPIO_OUT(mResetPin, 1);
 	cyg_thread_delay(1);
 

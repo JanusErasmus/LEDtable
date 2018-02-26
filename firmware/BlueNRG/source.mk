@@ -1,7 +1,7 @@
 ######################################
 # target
 ######################################
-TARGET = led_table
+TARGET = BlueNRG
 
 
 # Build path
@@ -15,14 +15,12 @@ CC_SOURCES = $(wildcard src/*.cpp)
 CC_SOURCES += $(wildcard src/*.cc)
 
 C_SOURCES = $(wildcard src/*.c)
+C_SOURCES += $(wildcard src/controller/*.c)
+C_SOURCES += $(wildcard src/hci/*.c)
+C_SOURCES += $(wildcard src/utils/*.c)
 
 # C defines
 #C_DEFS
 
 # C includes
-C_INCLUDES =  -I./include -I../caboodle/include -I../BlueNRG/include
-
-
-# libraries
-LIBS =  -lBlueNRG -lcaboodle
-LIBDIR = -L../caboodle/lib -L../BlueNRG/lib
+C_INCLUDES =  -I./include -I../caboodle/include

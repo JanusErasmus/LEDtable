@@ -126,7 +126,7 @@ $(BUILD_DIR)/%.o: %.s
 
 $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) 
 	@echo 'ELF $@'
-	@$(CXX)  -o $@ $(OBJECTS) $(LDFLAGS)
+	$(CXX)  -o $@ $(OBJECTS) $(LDFLAGS)
 	@$(SZ) $@
 
 $(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf
@@ -151,6 +151,9 @@ clean:
 #######################################
 # dependencies
 #######################################
--include $(wildcard $(BUILD_DIR)/*.d)  
+-include $(wildcard $(BUILD_DIR)/*.d)
+
+$(BUILD_DIR)/$(TARGET).elf: ../caboodle/lib/libcaboodle.a
+$(BUILD_DIR)/$(TARGET).elf: ../BlueNRG/lib/libBlueNRG.a
 
 # *** EOF ***

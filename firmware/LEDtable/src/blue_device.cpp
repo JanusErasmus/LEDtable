@@ -11,12 +11,29 @@ cBlueDevice *cBlueDevice::__instance = 0;
 
 void cButtonListener::handleData(uint8_t *data, uint8_t len)
 {
-   data[len] = 0;
+//   data[len] = 0;
+//   TRACE("cButtonListener: %d\n", len);
+//   diag_dump_buf(data, len + 1);
 
-   TRACE("cButtonListener: %d\n", len);
-   diag_dump_buf(data, len + 1);
-
-
+   if(mHandler)
+   {
+      if(data[0] == 'o')
+      {
+         mHandler->handleButton(cButtonHandler::UP);
+      }
+      if(data[0] == 'a')
+      {
+         mHandler->handleButton(cButtonHandler::DOWN);
+      }
+      if(data[0] == 'l')
+      {
+         mHandler->handleButton(cButtonHandler::LEFT);
+      }
+      if(data[0] == 'r')
+      {
+         mHandler->handleButton(cButtonHandler::RIGHT);
+      }
+   }
 }
 
 void cBlueDevice::init(cBlueNRG *blueNRG)
@@ -48,7 +65,7 @@ cBlueDevice::cBlueDevice(cBlueNRG *blueNRG)
 
 
       if(!service->add(buttonChar))
-         TRACE(RED("Lock NOT added\n"));
+         TRACE(RED("Listener NOT added\n"));
    }
 
    TRACE("All services\n");

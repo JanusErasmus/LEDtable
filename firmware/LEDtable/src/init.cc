@@ -13,6 +13,7 @@
 #include "led.h"
 #include "kses_term.h"
 
+#include "animation_mover.h"
 #include "animation_big_spiral.h"
 #include "animation_color.h"
 #include "animation_goomba.h"
@@ -90,7 +91,7 @@ void cInit::init_thread(cyg_addrword_t args)
     cWS281xDriver::init(cWS281xDriver::WS2812, 32, outputPortNumbers, 8);
 
     SpiFlash::init();
-//    initBLE();
+    initBLE();
 
     WS281receiver *receiver = new WS281receiver();
     cTerm::init((char *)"/dev/tty1",128,"LED>>");
@@ -103,14 +104,18 @@ void cInit::init_thread(cyg_addrword_t args)
     CharPrinter Cprinter(display);
     Cprinter.setString("  Cherise", blue, green);
 
+    MoverAnimation mover(display);
+    cBlueDevice::get()->setHandler(&mover);
+
     Animation *animations[] = {
-         &Jprinter,
-       new ColorAnimation(display),
-       new RunnerAnimation(display),
-       new SpiralsAnimation(display),
-       &Cprinter,
-       new BigSpiralAnimation(display),
-       new GoombaAnimation(display)
+          &mover,
+          &Jprinter,
+          new ColorAnimation(display),
+          new RunnerAnimation(display),
+          new SpiralsAnimation(display),
+          &Cprinter,
+          new BigSpiralAnimation(display),
+          new GoombaAnimation(display)
     };
     int index = 0;
 
@@ -118,6 +123,7 @@ void cInit::init_thread(cyg_addrword_t args)
 
     cWS281xDriver::get()->setAll(off);
     cWS281xDriver::get()->paint();
+
 
 //    cyg_uint8 buffer[1024];
 //    memset(buffer, 0, 8);
@@ -159,19 +165,19 @@ void cInit::init_thread(cyg_addrword_t args)
     //          cWS281xDriver::get()->paint();
 //              cyg_thread_delay(50);
 
+
     while(1)
     {
        if(animations[index])
           animations[index]->run();
        //else
 
-       if((cyg_current_time() - lastChange) > 6000)
-       {
-          lastChange = cyg_current_time();
-          if(++index > 6)
-             index = 0;
-       }
-
+//       if((cyg_current_time() - lastChange) > 6000)
+//       {
+//          lastChange = cyg_current_time();
+//          if(++index > 6)
+//             index = 0;
+//       }
     }
 }
 
